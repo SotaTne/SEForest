@@ -1,16 +1,11 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!doctype html>
 <html lang="ja">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta http-equiv="Content-Style-Type" content="text/css">
-<meta http-equiv="Content-Script-Type" content="text/javascript">
+<meta charset="UTF-8">
 <meta name="keywords" content="Aoki,Atsushi,Smalltalk,Smalltalker,Program,Programmer,Object,Oriented,Programming">
 <meta name="description" content="ソフトウェア工学IIのホームページ">
 <meta name="author" content="AOKI Atsushi">
-<link rev="made" href="index.html">
-<link rel="index" href="index.html">
-<style type="text/css">
-<!--
+<style>
 body {
   background-color : #ffffff;
   margin : 20px;
@@ -106,6 +101,13 @@ table.content {
   border-width : 0px;
   border-color : #000000;
   padding : 2px 4px;
+}
+table.bordered-table,
+table.bordered-table th,
+table.bordered-table td {
+  border-style : solid;
+  border-width : 1px;
+  border-color : #000000;
 }
 table.font-fixed {
   border-style : solid;
@@ -227,7 +229,6 @@ th {
   color: #FFFFFF;
   border: 1px solid #333333;
 }
--->
 </style>
 <title>ソフトウェア工学II「樹状整列」テスト仕様書</title>
 </head>
@@ -249,20 +250,20 @@ th {
 <hr>
 <h2>ソフトウェア工学II「樹状整列」テスト仕様書</h2>
 <div class="belt">
-<h3><a name="KanseiSaseteKudasai">完成させてください</a></h3>
+<h3><a id="KanseiSaseteKudasai">完成させてください</a></h3>
 </div>
 <ul>
   <li><a href="#Example">Example</a>（メインクラス）
   <li>…
 </ul>
 <div class="belt">
-<h3><a name="Example" href="../Program/index.html#Example">Example（メインクラス）</a></h3>
+<h3><a id="Example" href="../Program/index.html#Example">Example（メインクラス）</a></h3>
 </div>
-<table summary="table">
+<table aria-label="table">
   <tbody>
     <tr>
       <td>
-      <table border="1" summary="table">
+      <table class="bordered-table" aria-label="table">
         <tbody>
           <tr>
             <th class="left-padding" abbr="1">フィールド（属性：インスタンス変数）</th>
@@ -284,11 +285,11 @@ th {
     </tr>
   </tbody>
 </table>
-<table summary="table">
+<table aria-label="table">
   <tbody>
     <tr>
       <td>
-      <table border="1" summary="table">
+      <table class="bordered-table" aria-label="table">
         <tbody>
           <tr>
             <th class="left-padding" abbr="1">メソッド（操作）</th>
@@ -312,6 +313,6 @@ th {
   </tbody>
 </table>
 <hr>
-<div class="right-small">Copyright 20xx Project xx, Updated: 2017/03/13 (Created: 2009/11/11)</div>
+<div class="right-small">Copyright 20xx Project xx, Updated: 2026/06/24 (Created: 2009/11/11)</div>
 </body>
 </html>
