@@ -1,0 +1,53 @@
+name: CI Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Forest_Document/**"
+      - "docs/**"
+      - "README.md"
+      - "package.json"
+      - "bun.lock"
+      - ".github/workflows/**"
+      - ".markuplintrc"
+  pull_request:
+    branches: [main]
+    paths:
+      - "Forest_Document/**"
+      - "docs/**"
+      - "README.md"
+      - "package.json"
+      - "bun.lock"
+      - ".github/workflows/**"
+      - ".markuplintrc"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-html:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v5
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check HTML
+        run: bun run check:html -- "Forest_Document/**/*.html"
