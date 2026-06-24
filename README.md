@@ -68,8 +68,8 @@
 使用します。
 
 - Setup: `mise setup`
-- Python lint: `mise check`
-- Python auto-fix: `mise fix`
+- All checks: `mise check`
+- Python lint: `mise lint`
 - Python format: `mise format`
 - Type check: `mise typecheck`
 - Test: `mise test`
@@ -81,7 +81,7 @@
 
 - 変更内容とリスクに応じて必要なコマンドを選択します。
 - 共有コードや広範囲の変更では、関連する lint、format、typecheck、test を広く実行します。
-- `fix` と `format` は必要に応じて実行します。
+- `lint` と `format` は用途を分け、整形確認や整形が必要な場合は `format` を実行します。
 - ツールは検証済みの安定版へ固定します。更新は依頼に関係するものだけを対象とし、
   更新後に関連タスクを実行します。
 
