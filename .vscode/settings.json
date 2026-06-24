@@ -4,11 +4,12 @@
   "python.terminal.activateEnvironment": true,
   "python.testing.cwd": "${workspaceFolder}/Forest_Program",
 
-  "python.pyrefly.configPath": "Forest_Program/pyproject.toml",
-  "python.pyrefly.typeCheckingMode": "default",
-  "python.pyrefly.disableTypeErrors": false,
-  "python.pyrefly.diagnosticMode": "workspace",
-  "pyrefly.lspPath": "Forest_Program/.venv/bin/pyrefly",
+  "python.languageServer": "None",
+  "ty.path": ["${workspaceFolder}/Forest_Program/.venv/bin/ty"],
+  "ty.interpreter": "${workspaceFolder}/Forest_Program/.venv/bin/python",
+  "ty.diagnosticMode": "workspace",
+  "ty.inlayHints.variableTypes": false,
+  "ty.inlayHints.callArgumentNames": false,
 
   "editor.inlayHints.enabled": "on",
 
