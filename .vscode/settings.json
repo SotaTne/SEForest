@@ -1,0 +1,33 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/Forest_Program/.venv/bin/python",
+  "python.analysis.extraPaths": ["${workspaceFolder}/Forest_Program"],
+  "python.terminal.activateEnvironment": true,
+  "python.testing.cwd": "${workspaceFolder}/Forest_Program",
+
+  "python.pyrefly.configPath": "Forest_Program/pyproject.toml",
+  "python.pyrefly.typeCheckingMode": "default",
+  "python.pyrefly.disableTypeErrors": false,
+  "python.pyrefly.diagnosticMode": "workspace",
+  "pyrefly.lspPath": "Forest_Program/.venv/bin/pyrefly",
+
+  "editor.inlayHints.enabled": "on",
+
+  "ruff.path": ["${workspaceFolder}/Forest_Program/.venv/bin/ruff"],
+  "ruff.interpreter": ["${workspaceFolder}/Forest_Program/.venv/bin/python"],
+  "ruff.enable": true,
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    }
+  },
+
+  "html.format.enable": true,
+
+  "[html]": {
+    "editor.defaultFormatter": "yusukehirao.vscode-markuplint",
+    "editor.formatOnSave": true
+  }
+}

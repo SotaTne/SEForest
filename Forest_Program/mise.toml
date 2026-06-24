@@ -1,0 +1,27 @@
+[tools]
+python = { version = "3.13.13", virtualenv = ".venv" }
+uv = "0.11.13"
+
+[tasks.setup]
+description = "uvのセットアップを行います"
+run = "uv sync"
+
+[tasks.lint]
+description = "コードのチェックを行います"
+run = "uv run ruff check ."
+
+[tasks.typecheck]
+description = "型チェックを行います"
+run = "uv run ty check"
+
+[tasks.format]
+description = "コードのフォーマットを行います"
+run = "uv run ruff format ."
+
+[tasks.test]
+description = "テストを実行します"
+run = "uv run pytest"
+
+[tasks.build]
+description = "ビルドを行います"
+run = "uv run pyinstaller main.spec --noconfirm --workpath .pyinstaller-build"

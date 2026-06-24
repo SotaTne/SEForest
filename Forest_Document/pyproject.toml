@@ -1,0 +1,15 @@
+[project]
+name = "forest-program"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.21.0",
+    "pyrefly>=1.0.0",
+    "pytest>=9.1.0",
+    "ruff>=0.15.17",
+]

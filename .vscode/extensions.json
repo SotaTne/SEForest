@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "charliermarsh.ruff",
+    "meta.pyrefly",
+    "yusukehirao.vscode-markuplint",
+    "ecmel.vscode-html-css"
+  ]
+}

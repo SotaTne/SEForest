@@ -1,0 +1,76 @@
+[tools]
+bun = "1.3.14"
+python = { version = "3.13.13", virtualenv = "Forest_Program/.venv" }
+uv = "0.11.13"
+
+# セットアップ
+[tasks.setup]
+description = "プロジェクトのセットアップを行います"
+depends = ["setup:python", "setup:docs"]
+
+# 全てのチェック
+[tasks.check]
+description = "コードのチェックを行います"
+depends = ["lint", "typecheck", "format", "check:html"]
+
+# pythonのタスク
+[tasks."setup:python"]
+description = "uvのセットアップを行います"
+dir = "Forest_Program"
+run = "mise run setup"
+
+[tasks.lint]
+description = "コードのリントを行います"
+dir = "Forest_Program"
+run = "mise run lint"
+
+[tasks.typecheck]
+description = "型チェックを行います"
+dir = "Forest_Program"
+run = "mise run typecheck"
+
+[tasks.format]
+description = "コードのフォーマットを行います"
+dir = "Forest_Program"
+run = "mise run format"
+
+[tasks.test]
+description = "テストを実行します"
+dir = "Forest_Program"
+run = "mise run test"
+
+[tasks.build]
+description = "ビルドを行います"
+dir = "Forest_Program"
+run = "mise run build"
+
+# htmlのチェック
+[tasks."check:html"]
+description = "HTMLのコードのチェックを行います"
+usage = '''
+arg "[files]" var=#true help="チェック対象のHTMLファイルまたはglob"
+'''
+run = '''
+{% if usage.files | length > 0 %}
+bun run check:html --{% for file in usage.files %} {{ file | quote }}{% endfor %}
+{% else %}
+bun run check:html -- **/*.html
+{% endif %}
+'''
+
+# ドキュメントサーバー
+[tasks."setup:docs"]
+description = "ドキュメントサーバーのセットアップを行います"
+run = "bun install"
+
+[tasks."docs:dev"]
+description = "ドキュメントサーバーを起動します"
+run = "bun run dev"
+
+[tasks."docs:build"]
+description = "ドキュメントをビルドします"
+run = "bun run build"
+
+[tasks."docs:preview"]
+description = "ビルドしたドキュメントをプレビューします"
+run = "bun run preview"
