@@ -1,8 +1,8 @@
 /* Shared presentation for Mermaid UML diagrams. */
 .mermaid-container {
+  box-sizing : border-box;
   position : relative;
   overflow : auto;
-  max-height : 80vh;
   overscroll-behavior : contain;
   margin : 12px 0px;
   padding : 12px;

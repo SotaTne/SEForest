@@ -65,14 +65,16 @@ function addZoomControls(element, svg) {
 
   container.before(controls);
 
-  const minimumScale = Number(container.dataset.umlZoomMin ?? "0.5");
+  const minimumScale = Number(container.dataset.umlZoomMin ?? "0.25");
   const maximumScale = Number(container.dataset.umlZoomMax ?? "2");
   const scaleStep = Number(container.dataset.umlZoomStep ?? "0.25");
   const initialWidth = svg.getBoundingClientRect().width;
+  const initialHeight = container.getBoundingClientRect().height;
   let scale = 1;
   let touchStartDistance = 0;
   let touchStartScale = 1;
   let gestureStartScale = 1;
+  container.style.height = `${initialHeight}px`;
 
   const applyScale = (anchor = null) => {
     const previousBounds = svg.getBoundingClientRect();
