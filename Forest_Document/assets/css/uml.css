@@ -57,6 +57,14 @@
   font-size : 9pt;
 }
 
+.uml-zoom-controls .uml-zoom-save {
+  min-width : 48px;
+  margin-left : 6px;
+  border-color : #cbd5e1;
+  background-color : #ffffff;
+  font-size : 9pt;
+}
+
 .mermaid-container svg {
   display : block;
   min-width : 900px;
@@ -132,14 +140,6 @@
   background-color : #f1e5f6 !important;
 }
 
-.mermaid-container.uml-shared-aggregation svg .edgeTerminals {
-  translate : 15px 0px;
-}
-
-.mermaid-container.uml-shared-aggregation svg .edgeTerminals:last-child {
-  translate : -15px 0px;
-}
-
 .mermaid-container.uml-shared-aggregation svg .edgeTerminals foreignObject {
   overflow : visible;
 }
@@ -150,14 +150,12 @@
   height : 16px !important;
   margin-left : -3px;
   border : 0px;
-  background-color : #d8eee3 !important;
-  color : #245f43 !important;
   font-weight : normal;
   text-align : center;
 }
 
 .mermaid-container.uml-shared-aggregation svg .edgeTerminals foreignObject > div * {
-  color : #245f43 !important;
+  color : inherit !important;
 }
 
 .mermaid-error {

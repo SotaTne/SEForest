@@ -14,26 +14,31 @@ classDiagram
 direction TB
 
 class BBox {
-  +x: float
-  +y: float
-  +width: float
-  +height: float
+  -x: float
+  -y: float
+  -width: float
+  -height: float
 }
+note for BBox "位置と大きさを表す矩形領域"
 
 class BaseNode {
-  +text: str
-  +bbox: BBox
+  -text: str
+  -bbox: BBox
 }
+note for BaseNode "全ノードに共通する表示情報"
 
 class Node {
-  +childs: list~BaseNode~
+  -childs: list~BaseNode~
 }
+note for Node "子ノードを共有可能な形で保持"
 
 class Root {
-  +childs: list~BaseNode~
+  -childs: list~BaseNode~
 }
+note for Root "表示構造の起点となるノード"
 
 class Leaf
+note for Leaf "子を持たない末端ノード"
 
 BaseNode <|-- Node
 BaseNode <|-- Root
@@ -42,32 +47,41 @@ BaseNode "0..*" --o Root : childs
 BaseNode <|-- Leaf
 BaseNode *-- BBox : bbox
 
-class Window {
-  +windowSizeBBox: BBox
-  +windowCanvasBBox: BBox
-  +zoomScale: float
-  +editingText: str
+class Desktop {
+  -windowSizeBBox: BBox
+  -windowCanvasBBox: BBox
+  -zoomScale: float
 }
+note for Desktop "メイン画面の表示範囲と拡大率を保持"
 
-Window *-- BBox : windowSizeBBox
-Window *-- BBox : windowCanvasBBox
+Desktop *-- BBox : windowSizeBBox
+Desktop *-- BBox : windowCanvasBBox
+
+class NodeEditorState {
+  -selectedNode: BaseNode
+  -editingText: str
+  -popupBBox: BBox
+}
+note for NodeEditorState "選択ノードの編集状態を管理"
 
 class Model {
-  +sourceText: str
-  +nodes: list~BaseNode~
-  +spacing: float
-  +canvasBBox: BBox
-  +outputFile: Path
-  +selectedNode: BaseNode
-  +window: Window
+  -sourceText: str
+  -nodes: list~BaseNode~
+  -spacing: float
+  -canvasBBox: BBox
+  -outputFile: Path | None
+  -desktop: Desktop
+  -nodeEditorState: NodeEditorState | None
 }
+note for Model "アプリケーション全体の状態を保持"
 
 Model o-- "0..*" BaseNode : nodes
-Model *-- Window : window
+Model *-- Desktop : desktop
+Model *-- "0..1" NodeEditorState : nodeEditorState
 Model *-- BBox : canvasBBox
-Model --> BaseNode : selectedNode
 
 class Parser
+note for Parser "元テキストをノード一覧へ変換"
 
 Parser ..> BaseNode : creates
 
@@ -76,16 +90,19 @@ class LayoutCalculator {
   -parentsByNode
   -layoutVersion: int
 }
+note for LayoutCalculator "ノードの配置とbboxを計算"
 
-LayoutCalculator ..> BaseNode : adjusts bbox
-LayoutCalculator ..> Window : initial bounds
+LayoutCalculator ..> BaseNode : calculates bbox
+LayoutCalculator ..> Desktop : initial bounds
 
 class BBoxCalculator
+note for BBoxCalculator "選択範囲のbboxを算出"
 
 BBoxCalculator ..> BaseNode : reads bbox
 BBoxCalculator ..> BBox : creates
 
 class ImageRenderer
+note for ImageRenderer "選択ノード以下を画像化"
 
 ImageRenderer ..> BaseNode : selected descendants
 ImageRenderer ..> BBoxCalculator : image bounds
@@ -93,28 +110,39 @@ ImageRenderer ..> BBoxCalculator : image bounds
 class ModelObserver {
   <<interface>>
 }
+note for ModelObserver "モデル更新の通知を受け取る"
 
-class View {
-  +model: Model
+class DesktopView {
+  -model: Model
+  -nodeEditorPopupView: NodeEditorPopupView
 }
+note for DesktopView "メイン画面とキャンバスを表示"
+
+class NodeEditorPopupView
+note for NodeEditorPopupView "選択ノードの編集画面を表示"
 
 class Controller
+note for Controller "操作をモデルの更新へ変換"
 
 class ForestApp {
-  +model: Model
-  +view: View
-  +controller: Controller
+  -model: Model
+  -desktopView: DesktopView
+  -controller: Controller
 }
+note for ForestApp "MVC各要素を構成して起動"
 
-ModelObserver <|.. View
+ModelObserver <|.. DesktopView
+ModelObserver <|.. NodeEditorPopupView
 Model --> ModelObserver : notifies
-View ..> Model : renders
+DesktopView ..> Model : renders
+NodeEditorPopupView ..> Model : renders
+DesktopView *-- NodeEditorPopupView : nodeEditorPopupView
 Controller --> Model : updates
 ForestApp *-- Model : model
-ForestApp *-- View : view
+ForestApp *-- DesktopView : desktopView
 ForestApp *-- Controller : controller
 
 classDef mvc fill:#eaf2ff,stroke:#54749f,color:#20334d,stroke-width:1.5px
 classDef core fill:#fff8e8,stroke:#8a7446,color:#3f3522,stroke-width:1.5px
-cssClass "ForestApp,Model,View,Controller,ModelObserver,Window" mvc
+cssClass "ForestApp,Model,NodeEditorState,Desktop,DesktopView,NodeEditorPopupView,Controller,ModelObserver" mvc
 cssClass "BBox,BaseNode,Leaf,Node,Root,Parser,LayoutCalculator,BBoxCalculator,ImageRenderer" core
