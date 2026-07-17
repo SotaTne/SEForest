@@ -1,10 +1,60 @@
 /* Shared presentation for Mermaid UML diagrams. */
 .mermaid-container {
-  overflow-x : auto;
+  position : relative;
+  overflow : auto;
+  max-height : 80vh;
+  overscroll-behavior : contain;
   margin : 12px 0px;
   padding : 12px;
   border : 1px solid #cccccc;
+  background-color : #fbfcfe;
+  background-image : radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+  background-position : 0px 0px;
+  background-size : 20px 20px;
+}
+
+.uml-zoom-controls {
+  display : flex;
+  justify-content : flex-end;
+  align-items : center;
+  gap : 2px;
+  margin : 12px 0px 6px;
+}
+
+.uml-zoom-controls button {
+  min-width : 28px;
+  height : 28px;
+  padding : 0px 6px;
+  border : 1px solid transparent;
+  border-radius : 6px;
+  background-color : #f8fafc;
+  color : #334155;
+  font : inherit;
+  cursor : pointer;
+}
+
+.uml-zoom-controls button:hover:not(:disabled) {
+  background-color : #e8eef7;
+  border-color : #cbd5e1;
+  color : #1d4f91;
+}
+
+.uml-zoom-controls button:focus-visible {
+  outline : 2px solid #2563a6;
+  outline-offset : 1px;
+}
+
+.uml-zoom-controls button:disabled {
+  color : #999999;
+  cursor : default;
+}
+
+.uml-zoom-controls .uml-zoom-reset {
+  min-width : 52px;
+  border-color : #e2e8f0;
   background-color : #ffffff;
+  color : #475569;
+  font-size : 9pt;
 }
 
 .mermaid-container svg {
