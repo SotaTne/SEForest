@@ -28,22 +28,22 @@ class BaseNode {
 note for BaseNode "全ノードに共通する表示情報"
 
 class Node {
-  -childs: list~BaseNode~
+  -children: list~BaseNode~
 }
 note for Node "子ノードを共有可能な形で保持"
 
 class Root {
-  -childs: list~BaseNode~
+  -children: list~BaseNode~
 }
-note for Root "表示構造の起点となるノード"
+note for Root "表示開始点として明示されるノード"
 
 class Leaf
 note for Leaf "子を持たない末端ノード"
 
 BaseNode <|-- Node
 BaseNode <|-- Root
-BaseNode "0..*" --o Node : childs
-BaseNode "0..*" --o Root : childs
+BaseNode "0..*" --o Node : children
+BaseNode "0..*" --o Root : children
 BaseNode <|-- Leaf
 BaseNode *-- BBox : bbox
 
@@ -101,10 +101,16 @@ note for BBoxCalculator "選択範囲のbboxを算出"
 BBoxCalculator ..> BaseNode : reads bbox
 BBoxCalculator ..> BBox : creates
 
-class ImageRenderer
-note for ImageRenderer "選択ノード以下を画像化"
+class GraphTraversal
+note for GraphTraversal "共有ノードを考慮して到達可能なノードを探索"
 
-ImageRenderer ..> BaseNode : selected descendants
+GraphTraversal ..> BaseNode : traverses
+
+class ImageRenderer
+note for ImageRenderer "選択ノードから到達可能な範囲を画像化"
+
+ImageRenderer ..> BaseNode : selected node
+ImageRenderer ..> GraphTraversal : collects reachable nodes
 ImageRenderer ..> BBoxCalculator : image bounds
 
 class ModelObserver {
@@ -145,4 +151,4 @@ ForestApp *-- Controller : controller
 classDef mvc fill:#eaf2ff,stroke:#54749f,color:#20334d,stroke-width:1.5px
 classDef core fill:#fff8e8,stroke:#8a7446,color:#3f3522,stroke-width:1.5px
 cssClass "ForestApp,Model,NodeEditorState,Desktop,DesktopView,NodeEditorPopupView,Controller,ModelObserver" mvc
-cssClass "BBox,BaseNode,Leaf,Node,Root,Parser,LayoutCalculator,BBoxCalculator,ImageRenderer" core
+cssClass "BBox,BaseNode,Leaf,Node,Root,Parser,LayoutCalculator,BBoxCalculator,GraphTraversal,ImageRenderer" core
