@@ -147,7 +147,7 @@ function addDiagramControls(element, svg) {
     downloadLink.href = downloadUrl;
     downloadLink.download = fileName;
     downloadLink.click();
-    URL.revokeObjectURL(downloadUrl);
+    setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
   });
   container.addEventListener("wheel", (event) => {
     if (!event.ctrlKey && !event.metaKey) {
