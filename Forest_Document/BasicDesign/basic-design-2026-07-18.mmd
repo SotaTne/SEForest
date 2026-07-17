@@ -1,0 +1,120 @@
+---
+config:
+  layout: elk
+  elk:
+    mergeEdges: false
+    nodePlacementStrategy: BRANDES_KOEPF
+    considerModelOrder: PREFER_EDGES
+  class:
+    defaultRenderer: elk
+    nodeSpacing: 50
+    rankSpacing: 70
+---
+classDiagram
+direction TB
+
+class BBox {
+  +x: float
+  +y: float
+  +width: float
+  +height: float
+}
+
+class BaseNode {
+  +text: str
+  +bbox: BBox
+}
+
+class Node {
+  +childs: list~BaseNode~
+}
+
+class Root {
+  +childs: list~BaseNode~
+}
+
+class Leaf
+
+BaseNode <|-- Node
+BaseNode <|-- Root
+BaseNode "0..*" --o Node : childs
+BaseNode "0..*" --o Root : childs
+BaseNode <|-- Leaf
+BaseNode *-- BBox : bbox
+
+class Window {
+  +windowSizeBBox: BBox
+  +windowCanvasBBox: BBox
+  +zoomScale: float
+  +editingText: str
+}
+
+Window *-- BBox : windowSizeBBox
+Window *-- BBox : windowCanvasBBox
+
+class Model {
+  +sourceText: str
+  +nodes: list~BaseNode~
+  +spacing: float
+  +canvasBBox: BBox
+  +outputFile: Path
+  +selectedNode: BaseNode
+  +window: Window
+}
+
+Model o-- "0..*" BaseNode : nodes
+Model *-- Window : window
+Model *-- BBox : canvasBBox
+Model --> BaseNode : selectedNode
+
+class Parser
+
+Parser ..> BaseNode : creates
+
+class LayoutCalculator {
+  -measuredSizeCache
+  -parentsByNode
+  -layoutVersion: int
+}
+
+LayoutCalculator ..> BaseNode : adjusts bbox
+LayoutCalculator ..> Window : initial bounds
+
+class BBoxCalculator
+
+BBoxCalculator ..> BaseNode : reads bbox
+BBoxCalculator ..> BBox : creates
+
+class ImageRenderer
+
+ImageRenderer ..> BaseNode : selected descendants
+ImageRenderer ..> BBoxCalculator : image bounds
+
+class ModelObserver {
+  <<interface>>
+}
+
+class View {
+  +model: Model
+}
+
+class Controller
+
+class ForestApp {
+  +model: Model
+  +view: View
+  +controller: Controller
+}
+
+ModelObserver <|.. View
+Model --> ModelObserver : notifies
+View ..> Model : renders
+Controller --> Model : updates
+ForestApp *-- Model : model
+ForestApp *-- View : view
+ForestApp *-- Controller : controller
+
+classDef mvc fill:#eaf2ff,stroke:#54749f,color:#20334d,stroke-width:1.5px
+classDef core fill:#fff8e8,stroke:#8a7446,color:#3f3522,stroke-width:1.5px
+cssClass "ForestApp,Model,View,Controller,ModelObserver,Window" mvc
+cssClass "BBox,BaseNode,Leaf,Node,Root,Parser,LayoutCalculator,BBoxCalculator,ImageRenderer" core

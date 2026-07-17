@@ -1,0 +1,116 @@
+/* Shared presentation for Mermaid UML diagrams. */
+.mermaid-container {
+  overflow-x : auto;
+  margin : 12px 0px;
+  padding : 12px;
+  border : 1px solid #cccccc;
+  background-color : #ffffff;
+}
+
+.mermaid-container svg {
+  display : block;
+  min-width : 900px;
+  height : auto;
+  margin : 0px auto;
+}
+
+.mermaid-container svg path.relation[marker-start*="extension"] {
+  stroke : #c84655 !important;
+}
+
+.mermaid-container svg path.relation.edge-pattern-dashed[marker-start*="extension"] {
+  stroke : #5b5fc7 !important;
+}
+
+.mermaid-container svg path.relation[marker-start*="composition"] {
+  stroke : #d97706 !important;
+}
+
+.mermaid-container svg path.relation[marker-start*="aggregation"] {
+  stroke : #2f855a !important;
+}
+
+.mermaid-container svg path.relation.edge-pattern-solid[marker-end*="dependency"] {
+  stroke : #2563a6 !important;
+}
+
+.mermaid-container svg path.relation.edge-pattern-dashed[marker-end*="dependency"] {
+  stroke : #8b51a5 !important;
+}
+
+.mermaid-container svg marker[id*="extension"] path {
+  fill : #c84655 !important;
+  stroke : #c84655 !important;
+}
+
+.mermaid-container svg marker[id*="composition"] path {
+  fill : #d97706 !important;
+  stroke : #d97706 !important;
+}
+
+.mermaid-container svg marker[id*="aggregation"] path {
+  fill : #ffffff !important;
+  stroke : #2f855a !important;
+}
+
+.mermaid-container svg marker[id*="dependency"] path {
+  fill : #8b51a5 !important;
+  stroke : #8b51a5 !important;
+}
+
+.mermaid-container svg .relation-label-inheritance .labelBkg {
+  background-color : #f9e4e7 !important;
+}
+
+.mermaid-container svg .relation-label-composition .labelBkg {
+  background-color : #ffebd1 !important;
+}
+
+.mermaid-container svg .relation-label-aggregation .labelBkg {
+  background-color : #e5f5f1 !important;
+}
+
+.mermaid-container svg .relation-label-association .labelBkg {
+  background-color : #e2effb !important;
+}
+
+.mermaid-container svg .relation-label-realization .labelBkg {
+  background-color : #e8e8fa !important;
+}
+
+.mermaid-container svg .relation-label-dependency .labelBkg {
+  background-color : #f1e5f6 !important;
+}
+
+.mermaid-container.uml-shared-aggregation svg .edgeTerminals {
+  translate : 15px 0px;
+}
+
+.mermaid-container.uml-shared-aggregation svg .edgeTerminals:last-child {
+  translate : -15px 0px;
+}
+
+.mermaid-container.uml-shared-aggregation svg .edgeTerminals foreignObject {
+  overflow : visible;
+}
+
+.mermaid-container.uml-shared-aggregation svg .edgeTerminals foreignObject > div {
+  box-sizing : border-box;
+  width : 24px !important;
+  height : 16px !important;
+  margin-left : -3px;
+  border : 0px;
+  background-color : #d8eee3 !important;
+  color : #245f43 !important;
+  font-weight : normal;
+  text-align : center;
+}
+
+.mermaid-container.uml-shared-aggregation svg .edgeTerminals foreignObject > div * {
+  color : #245f43 !important;
+}
+
+.mermaid-error {
+  color : #990000;
+  white-space : pre-wrap;
+}

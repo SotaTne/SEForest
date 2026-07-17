@@ -5,6 +5,7 @@
 <meta name="keywords" content="Aoki,Atsushi,Smalltalk,Smalltalker,Program,Programmer,Object,Oriented,Programming">
 <meta name="description" content="ソフトウェア工学IIのホームページ">
 <meta name="author" content="AOKI Atsushi">
+<link rel="stylesheet" href="../assets/css/uml.css">
 <style>
 body {
   background-color : #ffffff;
@@ -223,7 +224,7 @@ th {
   border: 1px solid #333333;
 }
 </style>
-<title>ソフトウェア工学II「樹状整列」基本設計書</title>
+<title>ソフトウェア工学II「樹状整列」基本設計書（2026年7月18日時点）</title>
 </head>
 <body>
 <div id="menu">
@@ -241,11 +242,36 @@ th {
 </ul>
 </div>
 <hr>
-<h2>ソフトウェア工学II「樹状整列」基本設計書</h2>
+<h2>ソフトウェア工学II「樹状整列」基本設計書（2026年7月18日時点）</h2>
 <div class="belt">
-<h3><a id="KanseiSaseteKudasai">完成させてください</a></h3>
+<h3><a id="SekkeiGaiyou">設計概要</a></h3>
 </div>
+<p>本設計は、テキストから生成したノード群を樹状に整列し、ウィンドウへの表示、
+ノード名の編集、および選択したノード以下の画像出力を行うための基本構成を示す。</p>
+<ul>
+  <li>パーサーはテキストをノード群へ変換する。初期表示ではノードを縦方向へ並べ、
+  ウィンドウのCanvas表示範囲に応じて次の列へ送る。</li>
+  <li>整列計算機は間隔を用いてノードのBBoxを調整する。リネームで表示サイズが変わった場合は
+  差分再計算を試み、必要に応じて全体を再計算する。</li>
+  <li>BBox計算機は、全ノードのCanvas領域と、選択したノード以下の画像出力領域を計算する。</li>
+  <li>編集中の文字列はウィンドウが保持し、更新操作でノードへ反映する。
+  更新前に別のノードを選択した場合、編集中の文字列は破棄する。</li>
+</ul>
+<div class="belt">
+<h3><a id="KihonKousei">基本構成</a></h3>
+</div>
+<p>図のMermaidソースは
+<a href="basic-design-2026-07-18.mmd"><code>basic-design-2026-07-18.mmd</code></a>から読み込む。</p>
+<p>クラスはMVC関係を淡い青、それ以外を淡い黄で示す。関係線と説明ラベルは、
+虹の順序を参考に、継承を赤、コンポジションを橙、集約を緑、関連を青、
+実現を藍、依存を紫で示す。</p>
+<p>基本設計では構造上の保持関係とMVC・Observerの関係を示し、
+Modelから各処理を呼び出す実装上の依存関係は省略する。</p>
+<div class="mermaid-container uml-shared-aggregation">
+<pre class="mermaid" data-mermaid-source="basic-design-2026-07-18.mmd">基本設計図を読み込んでいます。</pre>
+</div>
+<script type="module" src="../assets/js/uml.js"></script>
 <hr>
-<div class="right-small">Copyright 20xx Project xx, Updated: 2026/06/24 (Created: 2009/11/11)</div>
+<div class="right-small">Copyright 20xx Project xx, Updated: 2026/07/18 (Created: 2009/11/11)</div>
 </body>
 </html>
