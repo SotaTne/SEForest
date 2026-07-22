@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="樹状整列アプリケーションのUI基本設計" />
+    <title>樹状整列 UI基本設計</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="slides">
+      <section class="slide" id="open-file" aria-labelledby="open-file-title">
+        <h1 id="open-file-title">01　ファイルを開く前</h1>
+        <div class="window empty-window">
+          <div class="drop-message">
+            <strong>ファイルをドロップ</strong>
+            <span>またはクリックして開く</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="view-tree" aria-labelledby="view-tree-title">
+        <h2 id="view-tree-title">02　樹状整列の表示</h2>
+        <div class="window forest-window">
+          <div class="canvas"><div class="tree" aria-hidden="true"></div></div>
+          <div class="scrollbar scrollbar-y" aria-hidden="true">
+            <span></span>
+          </div>
+          <div class="scrollbar scrollbar-x" aria-hidden="true">
+            <span></span>
+          </div>
+          <div class="scroll-corner" aria-hidden="true"></div>
+          <span class="step-count">03 / 10</span>
+        </div>
+      </section>
+
+      <section class="slide" id="stopped" aria-labelledby="stopped-title">
+        <h2 id="stopped-title">03　停止中</h2>
+        <div class="window forest-window">
+          <div class="canvas"><div class="tree" aria-hidden="true"></div></div>
+          <div class="playback" role="group" aria-label="停止中の再生操作">
+            <span class="play-icon" role="img" aria-label="再生">▶</span>
+            <span>03 / 10</span>
+          </div>
+          <div class="scrollbar scrollbar-y" aria-hidden="true">
+            <span></span>
+          </div>
+          <div class="scrollbar scrollbar-x" aria-hidden="true">
+            <span></span>
+          </div>
+          <div class="scroll-corner" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <section class="slide" id="running" aria-labelledby="running-title">
+        <h2 id="running-title">04　再生中</h2>
+        <div class="window forest-window">
+          <div class="canvas"><div class="tree" aria-hidden="true"></div></div>
+          <div class="playback" role="group" aria-label="再生中の操作">
+            <span class="pause-icon" role="img" aria-label="一時停止">Ⅱ</span>
+            <span>04 / 10</span>
+          </div>
+          <div class="scrollbar scrollbar-y" aria-hidden="true">
+            <span></span>
+          </div>
+          <div class="scrollbar scrollbar-x" aria-hidden="true">
+            <span></span>
+          </div>
+          <div class="scroll-corner" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <section class="slide" id="node-click" aria-labelledby="node-click-title">
+        <h2 id="node-click-title">05　ノードをクリックしたとき</h2>
+        <div class="window forest-window selected-window">
+          <div class="canvas"><div class="tree" aria-hidden="true"></div></div>
+          <aside
+            class="popover node-popover"
+            aria-label="選択したノードの操作窓"
+          >
+            <div class="popover-heading">
+              <input type="text" value="Magnitude" aria-label="ノード名" />
+              <button type="button" aria-label="閉じる">×</button>
+            </div>
+            <button class="popover-action" type="button">
+              <span class="action-icon" aria-hidden="true">↧</span>
+              <span
+                ><strong>画像に書き出す</strong
+                ><small>このノード以下</small></span
+              >
+            </button>
+          </aside>
+          <div class="scrollbar scrollbar-y" aria-hidden="true">
+            <span></span>
+          </div>
+          <div class="scrollbar scrollbar-x" aria-hidden="true">
+            <span></span>
+          </div>
+          <div class="scroll-corner" aria-hidden="true"></div>
+          <span class="step-count">03 / 10</span>
+        </div>
+      </section>
+
+      <section
+        class="slide"
+        id="canvas-click"
+        aria-labelledby="canvas-click-title"
+      >
+        <h2 id="canvas-click-title">06　何もない場所を右クリックしたとき</h2>
+        <div class="window forest-window">
+          <div class="canvas"><div class="tree" aria-hidden="true"></div></div>
+          <aside class="popover canvas-popover" aria-label="Canvasの操作窓">
+            <div class="popover-heading popover-label">
+              <span>キャンバス</span>
+              <button type="button" aria-label="閉じる">×</button>
+            </div>
+            <button class="popover-action" type="button">
+              <span class="action-icon" aria-hidden="true">↧</span>
+              <span
+                ><strong>画像に書き出す</strong><small>ツリー全体</small></span
+              >
+            </button>
+          </aside>
+          <div class="scrollbar scrollbar-y" aria-hidden="true">
+            <span></span>
+          </div>
+          <div class="scrollbar scrollbar-x" aria-hidden="true">
+            <span></span>
+          </div>
+          <div class="scroll-corner" aria-hidden="true"></div>
+          <span class="step-count">03 / 10</span>
+        </div>
+      </section>
+    </main>
+
+    <template id="tree-template">
+      <span class="node root">Object</span>
+      <span class="edge edge-root-top"></span>
+      <span class="edge edge-root-bottom"></span>
+      <span class="node magnitude">Magnitude</span>
+      <span class="node collection">Collection</span>
+      <span class="edge edge-mag-child"></span>
+      <span class="edge edge-col-top"></span>
+      <span class="edge edge-col-bottom"></span>
+      <span class="node arithmetic">ArithmeticValue</span>
+      <span class="node leaf bag">Bag</span>
+      <span class="node leaf sequence">SequenceableCollection</span>
+      <span class="edge edge-number"></span>
+      <span class="node leaf number">Number</span>
+    </template>
+    <script>
+      const template = document.querySelector("#tree-template");
+      for (const tree of document.querySelectorAll(".tree")) {
+        tree.append(template.content.cloneNode(true));
+      }
+    </script>
+  </body>
+</html>

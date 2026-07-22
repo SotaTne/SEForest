@@ -11,7 +11,7 @@ depends = ["setup:python", "setup:docs"]
 # 全てのチェック
 [tasks.check]
 description = "コードのチェックを行います"
-depends = ["lint", "typecheck", "format", "check:html"]
+depends = ["lint", "typecheck", "format", "check:html", "check:mmd"]
 
 # pythonのタスク
 [tasks."setup:python"]
@@ -54,9 +54,45 @@ run = '''
 {% if usage.files | length > 0 %}
 bun run check:html --{% for file in usage.files %} {{ file | quote }}{% endfor %}
 {% else %}
-bun run check:html -- **/*.html
+bun run check:html -- "**/*.html"
 {% endif %}
 '''
+
+# Mermaid図のチェック
+[tasks."check:mmd"]
+description = "Mermaid図をSVGへレンダリングして検証します"
+run = "bun run check:mmd"
+
+# HTMLのフォーマット
+[tasks."format:html"]
+description = "HTMLをPrettierで整形します"
+usage = '''
+arg "[files]" var=#true help="整形するHTMLファイルまたはglob"
+'''
+run = '''
+{% if usage.files | length > 0 %}
+bun run format:html --{% for file in usage.files %} {{ file | quote }}{% endfor %}
+{% else %}
+bun run format:html -- "Forest_Document/**/*.html"
+{% endif %}
+'''
+
+[tasks."check:format:html"]
+description = "HTMLがPrettierで整形済みか確認します"
+usage = '''
+arg "[files]" var=#true help="確認するHTMLファイルまたはglob"
+'''
+run = '''
+{% if usage.files | length > 0 %}
+bun run check:format:html --{% for file in usage.files %} {{ file | quote }}{% endfor %}
+{% else %}
+bun run check:format:html -- "Forest_Document/**/*.html"
+{% endif %}
+'''
+
+[tasks."typecheck:docs"]
+description = "ドキュメントの型チェックを行います"
+run = "bun run typecheck"
 
 # ドキュメントサーバー
 [tasks."setup:docs"]

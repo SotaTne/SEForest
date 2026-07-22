@@ -1,164 +1,179 @@
 /* Shared presentation for Mermaid UML diagrams. */
 .mermaid-container {
-  box-sizing : border-box;
-  position : relative;
-  overflow : auto;
-  overscroll-behavior : auto;
-  margin : 12px 0px;
-  padding : 12px;
-  border : 1px solid #cccccc;
-  background-color : #fbfcfe;
-  background-image : radial-gradient(circle, #cbd5e1 1px, transparent 1px);
-  background-position : 0px 0px;
-  background-size : 20px 20px;
+  box-sizing: border-box;
+  position: relative;
+  overflow: auto;
+  overscroll-behavior: auto;
+  margin: 12px 0px;
+  padding: 12px;
+  border: 1px solid #cccccc;
+  background-color: #fbfcfe;
+  background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+  background-position: 0px 0px;
+  background-size: 20px 20px;
 }
 
 .uml-zoom-controls {
-  display : flex;
-  justify-content : flex-end;
-  align-items : center;
-  gap : 2px;
-  margin : 12px 0px 6px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 2px;
+  margin: 12px 0px 6px;
 }
 
 .uml-zoom-controls button {
-  min-width : 28px;
-  height : 28px;
-  padding : 0px 6px;
-  border : 1px solid transparent;
-  border-radius : 6px;
-  background-color : #f8fafc;
-  color : #334155;
-  font : inherit;
-  cursor : pointer;
+  min-width: 28px;
+  height: 28px;
+  padding: 0px 6px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background-color: #f8fafc;
+  color: #334155;
+  font: inherit;
+  cursor: pointer;
 }
 
 .uml-zoom-controls button:hover:not(:disabled) {
-  background-color : #e8eef7;
-  border-color : #cbd5e1;
-  color : #1d4f91;
+  background-color: #e8eef7;
+  border-color: #cbd5e1;
+  color: #1d4f91;
 }
 
 .uml-zoom-controls button:focus-visible {
-  outline : 2px solid #2563a6;
-  outline-offset : 1px;
+  outline: 2px solid #2563a6;
+  outline-offset: 1px;
 }
 
 .uml-zoom-controls button:disabled {
-  color : #999999;
-  cursor : default;
+  color: #999999;
+  cursor: default;
 }
 
 .uml-zoom-controls .uml-zoom-reset {
-  min-width : 52px;
-  border-color : #e2e8f0;
-  background-color : #ffffff;
-  color : #475569;
-  font-size : 9pt;
+  min-width: 52px;
+  border-color: #e2e8f0;
+  background-color: #ffffff;
+  color: #475569;
+  font-size: 9pt;
 }
 
 .uml-zoom-controls .uml-zoom-save {
-  min-width : 48px;
-  margin-left : 6px;
-  border-color : #cbd5e1;
-  background-color : #ffffff;
-  font-size : 9pt;
+  min-width: 48px;
+  margin-left: 6px;
+  border-color: #cbd5e1;
+  background-color: #ffffff;
+  font-size: 9pt;
 }
 
 .mermaid-container svg {
-  display : block;
-  min-width : 900px;
-  height : auto;
-  margin : 0px auto;
+  display: block;
+  min-width: 900px;
+  height: auto;
+  margin: 0px auto;
 }
 
 .mermaid-container svg path.relation[marker-start*="extension"] {
-  stroke : #c84655 !important;
+  stroke: #c84655 !important;
 }
 
-.mermaid-container svg path.relation.edge-pattern-dashed[marker-start*="extension"] {
-  stroke : #5b5fc7 !important;
+.mermaid-container
+  svg
+  path.relation.edge-pattern-dashed[marker-start*="extension"] {
+  stroke: #5b5fc7 !important;
 }
 
 .mermaid-container svg path.relation[marker-start*="composition"] {
-  stroke : #d97706 !important;
+  stroke: #d97706 !important;
 }
 
 .mermaid-container svg path.relation[marker-start*="aggregation"] {
-  stroke : #2f855a !important;
+  stroke: #2f855a !important;
 }
 
-.mermaid-container svg path.relation.edge-pattern-solid[marker-end*="dependency"] {
-  stroke : #2563a6 !important;
+.mermaid-container
+  svg
+  path.relation.edge-pattern-solid[marker-end*="dependency"] {
+  stroke: #2563a6 !important;
 }
 
-.mermaid-container svg path.relation.edge-pattern-dashed[marker-end*="dependency"] {
-  stroke : #8b51a5 !important;
+.mermaid-container
+  svg
+  path.relation.edge-pattern-dashed[marker-end*="dependency"] {
+  stroke: #8b51a5 !important;
 }
 
 .mermaid-container svg marker[id*="extension"] path {
-  fill : #c84655 !important;
-  stroke : #c84655 !important;
+  fill: #c84655 !important;
+  stroke: #c84655 !important;
 }
 
 .mermaid-container svg marker[id*="composition"] path {
-  fill : #d97706 !important;
-  stroke : #d97706 !important;
+  fill: #d97706 !important;
+  stroke: #d97706 !important;
 }
 
 .mermaid-container svg marker[id*="aggregation"] path {
-  fill : #ffffff !important;
-  stroke : #2f855a !important;
+  fill: #ffffff !important;
+  stroke: #2f855a !important;
 }
 
 .mermaid-container svg marker[id*="dependency"] path {
-  fill : #8b51a5 !important;
-  stroke : #8b51a5 !important;
+  fill: #8b51a5 !important;
+  stroke: #8b51a5 !important;
 }
 
 .mermaid-container svg .relation-label-inheritance .labelBkg {
-  background-color : #f9e4e7 !important;
+  background-color: #f9e4e7 !important;
 }
 
 .mermaid-container svg .relation-label-composition .labelBkg {
-  background-color : #ffebd1 !important;
+  background-color: #ffebd1 !important;
 }
 
 .mermaid-container svg .relation-label-aggregation .labelBkg {
-  background-color : #e5f5f1 !important;
+  background-color: #e5f5f1 !important;
 }
 
 .mermaid-container svg .relation-label-association .labelBkg {
-  background-color : #e2effb !important;
+  background-color: #e2effb !important;
 }
 
 .mermaid-container svg .relation-label-realization .labelBkg {
-  background-color : #e8e8fa !important;
+  background-color: #e8e8fa !important;
 }
 
 .mermaid-container svg .relation-label-dependency .labelBkg {
-  background-color : #f1e5f6 !important;
+  background-color: #f1e5f6 !important;
 }
 
 .mermaid-container.uml-shared-aggregation svg .edgeTerminals foreignObject {
-  overflow : visible;
+  overflow: visible;
 }
 
-.mermaid-container.uml-shared-aggregation svg .edgeTerminals foreignObject > div {
-  box-sizing : border-box;
-  width : 24px !important;
-  height : 16px !important;
-  margin-left : -3px;
-  border : 0px;
-  font-weight : normal;
-  text-align : center;
+.mermaid-container.uml-shared-aggregation
+  svg
+  .edgeTerminals
+  foreignObject
+  > div {
+  box-sizing: border-box;
+  width: 24px !important;
+  height: 16px !important;
+  margin-left: -3px;
+  border: 0px;
+  font-weight: normal;
+  text-align: center;
 }
 
-.mermaid-container.uml-shared-aggregation svg .edgeTerminals foreignObject > div * {
-  color : inherit !important;
+.mermaid-container.uml-shared-aggregation
+  svg
+  .edgeTerminals
+  foreignObject
+  > div
+  * {
+  color: inherit !important;
 }
 
 .mermaid-error {
-  color : #990000;
-  white-space : pre-wrap;
+  color: #990000;
+  white-space: pre-wrap;
 }
