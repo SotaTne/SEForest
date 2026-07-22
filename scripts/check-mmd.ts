@@ -1,6 +1,7 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
+import { run } from "@mermaid-js/mermaid-cli";
 
 const mermaidFiles = [
   ...new Bun.Glob("**/*.mmd").scanSync({
@@ -22,25 +23,12 @@ try {
       outputDirectory,
       `${index}-${basename(inputFile, ".mmd")}.svg`,
     );
-    const renderProcess = Bun.spawn(
-      [
-        join(process.cwd(), "node_modules", ".bin", "mmdc"),
-        "--input",
-        inputFile,
-        "--output",
-        outputFile,
-        "--quiet",
-      ],
-      {
-        stdout: "inherit",
-        stderr: "inherit",
-      },
-    );
-    const exitCode = await renderProcess.exited;
-
-    if (exitCode !== 0) {
-      throw new Error(`${inputFile} のレンダリングに失敗しました。`);
-    }
+    await run(inputFile, outputFile, {
+      quiet: true,
+      puppeteerConfig: process.env.CI
+        ? { args: ["--no-sandbox", "--disable-setuid-sandbox"] }
+        : {},
+    });
 
     console.log(`[check:mmd] passed ${inputFile}`);
   }

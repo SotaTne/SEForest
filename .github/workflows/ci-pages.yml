@@ -9,7 +9,7 @@ on:
       - "README.md"
       - "package.json"
       - "bun.lock"
-      - "scripts/check-mmd.ts"
+      - "scripts/**"
       - ".github/workflows/**"
       - ".markuplintrc"
   pull_request:
@@ -20,7 +20,7 @@ on:
       - "README.md"
       - "package.json"
       - "bun.lock"
-      - "scripts/check-mmd.ts"
+      - "scripts/**"
       - ".github/workflows/**"
       - ".markuplintrc"
   workflow_dispatch:
