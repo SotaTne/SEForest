@@ -1,0 +1,9 @@
+# .markuplintrcと同じ生成物・参考資料を除外する。
+**/dist/**
+**/.pyinstaller-build/**
+Project_Forest_Hints/**
+**/.venv/**
+
+# 依存関係とVitePressの生成キャッシュ。
+node_modules/**
+docs/.vitepress/cache

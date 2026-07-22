@@ -1,0 +1,399 @@
+:root {
+  color: #37352f;
+  background: #eeeeee;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  min-width: 760px;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.slides {
+  display: grid;
+  gap: 72px;
+  padding: 40px;
+}
+
+.slide {
+  width: min(1180px, calc(100vw - 80px));
+  margin: 0 auto;
+}
+
+.slide h1,
+.slide h2 {
+  margin: 0 0 12px;
+  color: #5f5e5b;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.window {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #cccccc;
+  border-radius: 10px;
+  box-shadow: 0 14px 40px rgb(15 15 15 / 8%);
+}
+
+.empty-window {
+  display: grid;
+  place-items: center;
+}
+
+.drop-message {
+  display: grid;
+  gap: 7px;
+  text-align: center;
+}
+
+.drop-message strong {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.drop-message span {
+  color: #787774;
+  font-size: 12px;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0 11px 11px 0;
+  overflow: hidden;
+  background-image: radial-gradient(#d9d9d7 0.7px, transparent 0.7px);
+  background-size: 20px 20px;
+}
+
+.tree {
+  position: absolute;
+  top: 15%;
+  left: 13%;
+  width: 850px;
+  height: 470px;
+  font-size: 13px;
+}
+
+.node {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  min-width: 86px;
+  height: 30px;
+  padding: 0 10px;
+  background: #fbfaf8;
+  border: 1px solid #e5e1dc;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.node.root {
+  background: #faf5f0;
+  border-color: #e6d9ce;
+  color: #554c44;
+  font-weight: 600;
+}
+
+.node.leaf {
+  background: #f6faf4;
+  border-color: #dce8d8;
+  color: #465143;
+}
+
+.selected-window .node.magnitude {
+  background: #f3eee8;
+  border-color: #cbc3ba;
+  box-shadow: 0 0 0 1px rgb(55 53 47 / 6%);
+}
+
+.edge {
+  position: absolute;
+  z-index: 1;
+  height: 1px;
+  background: #c5c5c2;
+  transform-origin: left center;
+}
+
+.root {
+  top: 205px;
+  left: 0;
+}
+.magnitude {
+  top: 105px;
+  left: 190px;
+}
+.collection {
+  top: 305px;
+  left: 190px;
+}
+.arithmetic {
+  top: 50px;
+  left: 405px;
+}
+.bag {
+  top: 250px;
+  left: 405px;
+}
+.sequence {
+  top: 360px;
+  left: 405px;
+}
+.number {
+  top: 50px;
+  left: 630px;
+}
+
+.edge-root-top {
+  top: 220px;
+  left: 86px;
+  width: 145px;
+  transform: rotate(-44deg);
+}
+.edge-root-bottom {
+  top: 220px;
+  left: 86px;
+  width: 145px;
+  transform: rotate(44deg);
+}
+.edge-mag-child {
+  top: 120px;
+  left: 276px;
+  width: 137px;
+  transform: rotate(-24deg);
+}
+.edge-col-top {
+  top: 320px;
+  left: 276px;
+  width: 137px;
+  transform: rotate(-24deg);
+}
+.edge-col-bottom {
+  top: 320px;
+  left: 276px;
+  width: 149px;
+  transform: rotate(23deg);
+}
+.edge-number {
+  top: 66px;
+  left: 523px;
+  width: 107px;
+}
+
+.step-count {
+  position: absolute;
+  right: 28px;
+  bottom: 26px;
+  color: #787774;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.scrollbar {
+  position: absolute;
+  z-index: 6;
+  background: #f5f5f5;
+}
+
+.scrollbar span {
+  position: absolute;
+  display: block;
+  background: #b7b7b7;
+  border-radius: 8px;
+}
+
+.scrollbar-y {
+  top: 0;
+  right: 0;
+  bottom: 11px;
+  width: 11px;
+  border-left: 1px solid #dddddd;
+}
+
+.scrollbar-y span {
+  top: 18%;
+  right: 2px;
+  width: 6px;
+  height: 35%;
+}
+
+.scrollbar-x {
+  right: 11px;
+  bottom: 0;
+  left: 0;
+  height: 11px;
+  border-top: 1px solid #dddddd;
+}
+
+.scrollbar-x span {
+  bottom: 2px;
+  left: 17%;
+  width: 43%;
+  height: 6px;
+}
+
+.scroll-corner {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 7;
+  width: 11px;
+  height: 11px;
+  background: #eeeeee;
+  border-top: 1px solid #dddddd;
+  border-left: 1px solid #dddddd;
+}
+
+.playback {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 112px;
+  padding: 9px 13px;
+  color: #787774;
+  background: rgb(255 255 255 / 92%);
+  border: 1px solid rgb(15 15 15 / 8%);
+  border-radius: 8px;
+  box-shadow: 0 5px 18px rgb(15 15 15 / 10%);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  transform: translateX(-50%);
+}
+
+.play-icon,
+.pause-icon {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  color: #3f3f3f;
+  font-size: 10px;
+}
+
+.pause-icon {
+  letter-spacing: -2px;
+}
+
+.popover {
+  position: absolute;
+  z-index: 5;
+  width: 246px;
+  padding: 6px;
+  background: #ffffff;
+  border: 1px solid rgb(15 15 15 / 12%);
+  border-radius: 6px;
+  box-shadow:
+    0 5px 18px rgb(15 15 15 / 12%),
+    0 1px 3px rgb(15 15 15 / 8%);
+}
+
+.node-popover {
+  top: 28%;
+  left: 46%;
+}
+
+.canvas-popover {
+  top: 55%;
+  left: 61%;
+}
+
+.popover-heading {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px;
+  border-bottom: 1px solid rgb(15 15 15 / 8%);
+}
+
+.popover-heading input {
+  min-width: 0;
+  flex: 1;
+  padding: 7px 8px;
+  color: #37352f;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  outline: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.popover-heading button {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  color: #787774;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.popover-label {
+  justify-content: space-between;
+  padding: 2px 2px 4px 8px;
+  color: #787774;
+  font-size: 10px;
+}
+
+.popover-action {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  margin-top: 4px;
+  padding: 7px 8px;
+  color: #37352f;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  text-align: left;
+}
+
+.popover-action > span:last-child {
+  display: grid;
+  gap: 1px;
+}
+
+.popover-action strong {
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.popover-action small {
+  color: #9b9a97;
+  font-size: 10px;
+}
+
+.action-icon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: #787774;
+  font-size: 15px;
+}
