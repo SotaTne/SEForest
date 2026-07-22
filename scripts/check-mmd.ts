@@ -22,7 +22,7 @@ try {
     const outputFile = join(
       outputDirectory,
       `${index}-${basename(inputFile, ".mmd")}.svg`,
-    );
+    ) as `${string}.svg`;
     await run(inputFile, outputFile, {
       quiet: true,
       puppeteerConfig: process.env.CI
