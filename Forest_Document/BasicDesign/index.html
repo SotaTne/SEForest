@@ -5,223 +5,50 @@
 <meta name="keywords" content="Aoki,Atsushi,Smalltalk,Smalltalker,Program,Programmer,Object,Oriented,Programming">
 <meta name="description" content="ソフトウェア工学IIのホームページ">
 <meta name="author" content="AOKI Atsushi">
+<link rel="stylesheet" href="../assets/css/docs.css">
 <link rel="stylesheet" href="../assets/css/uml.css">
 <style>
-body {
-  background-color : #ffffff;
-  margin : 20px;
-  padding : 10px;
-  font-family : serif;
-  font-size : 10pt;
+.ui-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0px, 1fr));
+  gap: 20px;
+  margin: 16px 0px 28px;
 }
-a {
-  text-decoration : underline;
-  color : #000000;
-}
-a:link {
-  background-color : #ffddbb;
-}
-a:visited {
-  background-color : #ccffcc;
-}
-a:hover {
-  background-color : #dddddd;
-}
-a:active {
-  background-color : #dddddd;
-}
-div.belt {
-  background-color : #eeeeee;
-  padding : 0px 4px;
-}
-div.belt-yellow {
-  background-color : #ffffcc;
-  padding : 0px 4px;
-}
-div.belt-blue {
-  background-color : #ddeeff;
-  padding : 0px 4px;
-}
-div.right-small {
-  text-align : right;
-  font-size : 8pt;
-}
-img.border {
-  border-width : 1px;
-  border-color : #000000;
-  vertical-align : middle;
-}
-img.borderless {
-  border-width : 0px;
-  vertical-align : middle;
-}
-p.belt {
-  background-color : #ffeedd;
-  padding : 4px 8px;
-}
-p.belt-blue {
-  background-color : #ddeeff;
-  padding : 4px 8px;
-}
-pre.belt {
-  background-color : #ddeeff;
-  padding : 4px 8px;
-}
-pre.belt-yellow {
-  background-color : #ffffcc;
-  padding : 4px 8px;
-}
-table {
-  border-style : solid;
-  border-width : 0px;
-  border-color : #000000;
-  font-family : serif;
-  font-size : 10pt;
-}
-table.profile {
-  border-style : solid;
-  border-width : 0px;
-  border-color : #000000;
-  font-family : serif;
-  font-size : 10pt;
-  margin-top : 8px;
-  margin-left : 8px;
-  margin-right : 8px;
-  margin-bottom : 8px;
-}
-table.belt {
-  border-style : solid;
-  border-width : 0px;
-  border-color : #000000;
-  background-color : #ffeedd;
-  padding : 0px 0px;
-  width : 100%;
-}
-table.content {
-  border-style : solid;
-  border-width : 0px;
-  border-color : #000000;
-  padding : 2px 4px;
-}
-table.font-fixed {
-  border-style : solid;
-  border-width : 0px;
-  border-color : #000000;
-  padding : 2px 4px;
-  font-family : monospace;
-}
-table.nest {
-  border-style : solid;
-  border-width : 0px;
-  border-color : #000000;
-  padding : 0px 0px;
-}
-td {
-  padding : 0px 0px;
-  vertical-align : middle;
-}
-td.center {
-  text-align : center;
-}
-td.center-half {
-  text-align : center;
-  width : 50%;
-  font-size : 8pt;
-}
-td.center-small {
-  text-align : center;
-  font-size : 8pt;
-  padding : 0px 4px;
-}
-td.center-small-nopadding {
-  text-align : center;
-  font-size : 8pt;
-  padding : 0px 0px;
-}
-td.center-white {
-  text-align : center;
-  background-color : #ffffff;
-}
-td.center-small-white {
-  text-align : center;
-  font-size : 8pt;
-  background-color : #ffffff;
-}
-td.center-border1 {
-  text-align : center;
-  vertical-align : middle;
-  empty-cells : show;
-  border-style : solid;
-  border-width : 1px;
-  border-color : #ffc080;
-  width : 22px;
-  height : 22px;
-}
-td.left-small {
-  text-align : left;
-  font-size : 8pt;
-  padding : 0px 4px;
-}
-td.left-small-white {
-  text-align : left;
-  font-size : 8pt;
-  padding : 0px 4px;
-  background-color : #ffffff;
-}
-td.right-small {
-  text-align : right;
-  font-size : 8pt;
-  padding : 0px 4px;
-}
-td.right-small-white {
-  text-align : right;
-  font-size : 8pt;
-  padding : 0px 4px;
-  background-color : #ffffff;
-}
-th {
-  padding : 0px 0px;
-  vertical-align : middle;
-}
-#menu {
-  margin: 0px 0px 0px 0px;
-  padding: 0px;
-  height: 32px;
-}
-#menu ul {
+.ui-figure {
   margin: 0px;
-  padding: 0px;
-  list-style: none;
-  text-align: center;
-  clear: both;
 }
-#menu li {
-  margin: 0px 5px 0px 0px;
-  padding: 0px;
-  float: left;
-}
-#menu a {
+.ui-figure img {
   display: block;
-  padding: 2px 4px;
-  text-decoration: none;
-  margin: 0px;
-  font-weight: bold;
-  background: #FFFFFF;
-  color: #333333;
-  border: 1px solid #666666;
+  width: 100%;
+  height: auto;
+  border: 1px solid #cccccc;
 }
-#menu a:hover {
+.ui-figure figcaption {
+  margin-top: 6px;
+  font-size: 9pt;
+}
+.ui-figure figcaption strong {
   display: block;
-  padding: 2px 4px;
-  border-bottom: 1px solid #000000;
-  text-decoration: none;
-  background: #FFCC66;
+  margin-bottom: 2px;
 }
-#menu .current {
-  background-color: #F45F57;
-  font-weight: bold;
-  color: #FFFFFF;
-  border: 1px solid #333333;
+@media (max-width: 760px) {
+  .ui-gallery {
+    grid-template-columns: 1fr;
+  }
+}
+table.ui-spec {
+  width: 100%;
+  border-collapse: collapse;
+}
+table.ui-spec th,
+table.ui-spec td {
+  padding: 6px 8px;
+  border: 1px solid #cccccc;
+  vertical-align: top;
+}
+table.ui-spec th {
+  background-color: #eeeeee;
+  text-align: left;
 }
 </style>
 <title>ソフトウェア工学II「樹状整列」基本設計書（2026年7月18日時点）</title>
@@ -271,7 +98,143 @@ Modelから各処理を呼び出す実装上の依存関係は省略する。</p
 <pre class="mermaid" data-mermaid-source="basic-design-2026-07-18.mmd">基本設計図を読み込んでいます。</pre>
 </div>
 <script type="module" src="../assets/js/uml.js"></script>
+<div class="belt">
+<h3><a id="UserInterface">ユーザーインターフェース</a></h3>
+</div>
+<p>画面は樹状整列のCanvasを中心とし、常設する操作要素を最小限にする。
+ルートは薄い茶色、中間ノードは薄いベージュ、リーフは薄い緑で表示する。
+Canvasが表示領域より大きい場合は、右端と下端にスクロールバーを表示する。</p>
+
+<div class="ui-gallery">
+<figure class="ui-figure">
+<img src="ui/open_file.png" alt="ファイルのドロップまたはクリックによる選択を案内する初期画面">
+<figcaption><strong>図1　ファイルを開く前</strong>ファイルのドロップまたはクリックによる選択を案内する。</figcaption>
+</figure>
+
+<figure class="ui-figure">
+<img src="ui/view_tree.png" alt="左から右へ伸びる樹形図をCanvasに表示した画面">
+<figcaption><strong>図2　樹状整列の表示</strong>左から右へ伸びる樹形図をCanvasに表示する。</figcaption>
+</figure>
+
+<figure class="ui-figure">
+<img src="ui/stop.png" alt="再生、タイムライン、前後工程の操作を表示した停止中の画面">
+<figcaption><strong>図3　停止中</strong>再生、タイムライン、前後工程の操作を表示する。</figcaption>
+</figure>
+
+<figure class="ui-figure">
+<img src="ui/running.png" alt="一時停止、タイムライン、現在工程を表示した再生中の画面">
+<figcaption><strong>図4　再生中</strong>一時停止、タイムライン、現在工程を表示する。</figcaption>
+</figure>
+
+<figure class="ui-figure">
+<img src="ui/click.png" alt="選択したノードの名前編集と部分画像出力を行う小窓を表示した画面">
+<figcaption><strong>図5　ノードの選択</strong>名前編集と部分画像出力を行う小窓を表示する。</figcaption>
+</figure>
+
+<figure class="ui-figure">
+<img src="ui/save.png" alt="ツリー全体の画像出力を行うCanvas用の小窓を表示した画面">
+<figcaption><strong>図6　ツリー全体の画像出力</strong>Canvas用の小窓を表示する。</figcaption>
+</figure>
+</div>
+
+<h4>画面操作</h4>
+<table class="ui-spec" aria-label="画面操作と結果">
+<thead>
+<tr>
+  <th scope="col">状態・操作対象</th>
+  <th scope="col">操作</th>
+  <th scope="col">結果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>ファイルを開く前</td>
+  <td>テキストファイルを画面へドロップする</td>
+  <td>ファイルを読み込み、ウィンドウのCanvas表示範囲を基準にノードを初期配置する。</td>
+</tr>
+<tr>
+  <td>ファイルを開く前</td>
+  <td>画面中央を左クリックする</td>
+  <td>ファイル選択画面を開く。ファイルを選択すると読み込みと初期配置を行う。</td>
+</tr>
+<tr>
+  <td>Canvas</td>
+  <td>ドラッグする</td>
+  <td>ドラッグ量に応じてCanvasをスクロールする。クリックとは、押下位置から一定量以上移動したかで区別する。</td>
+</tr>
+<tr>
+  <td>Canvas</td>
+  <td>ホイールまたはトラックパッドを操作する</td>
+  <td>Canvasを上下左右にスクロールする。スクロール位置は画面右端と下端のバーへ反映する。</td>
+</tr>
+<tr>
+  <td>Canvas</td>
+  <td>ピンチ操作、または修飾キーを押しながらホイールを操作する</td>
+  <td>操作位置を基準として樹形図を拡大または縮小する。</td>
+</tr>
+<tr>
+  <td>画面下部</td>
+  <td>ポインターを近づける</td>
+  <td>再生操作を表示する。ポインターが離れ、操作していない場合は再生操作を隠す。</td>
+</tr>
+<tr>
+  <td>停止中</td>
+  <td>再生を左クリックする、またはSpaceキーを押す</td>
+  <td>整列工程の再生を開始する。前後工程の操作を隠し、一時停止操作を表示する。</td>
+</tr>
+<tr>
+  <td>停止中</td>
+  <td>工程番号の左右を左クリックする、または左右キーを押す</td>
+  <td>一つ前または一つ後の整列工程を表示する。</td>
+</tr>
+<tr>
+  <td>停止中</td>
+  <td>タイムラインを左クリックまたはドラッグする</td>
+  <td>指定した位置に対応する整列工程を表示する。</td>
+</tr>
+<tr>
+  <td>再生中</td>
+  <td>一時停止を左クリックする、またはSpaceキーを押す</td>
+  <td>現在の工程で再生を停止し、前後工程の操作を表示する。</td>
+</tr>
+<tr>
+  <td>ノードまたはリーフ</td>
+  <td>左クリックする</td>
+  <td>対象の名前を標準出力へ書き出し、対象を選択して小窓を表示する。</td>
+</tr>
+<tr>
+  <td>ノードの小窓</td>
+  <td>名前を編集してEnterキーを押す</td>
+  <td>名前を対象へ反映し、表示サイズの変化に応じて整列とCanvas領域を再計算する。</td>
+</tr>
+<tr>
+  <td>ノードの小窓</td>
+  <td>「画像に書き出す」を左クリックする</td>
+  <td>選択したノードから到達可能なノードと枝の範囲を画像として保存する。</td>
+</tr>
+<tr>
+  <td>ノードのない場所</td>
+  <td>左クリックする</td>
+  <td>ノードの選択を解除し、表示中の小窓を閉じる。</td>
+</tr>
+<tr>
+  <td>ノードのない場所</td>
+  <td>右クリック、トラックパッドの2本指クリック、またはControl＋クリックを行う</td>
+  <td>通常のコンテキストメニューに代えてCanvas用の小窓を表示する。</td>
+</tr>
+<tr>
+  <td>Canvasの小窓</td>
+  <td>「画像に書き出す」を左クリックする</td>
+  <td>ツリー全体を含むCanvas領域を画像として保存する。</td>
+</tr>
+<tr>
+  <td>小窓</td>
+  <td>閉じる操作を左クリックする、またはEscapeキーを押す</td>
+  <td>編集内容を確定せずに小窓を閉じる。</td>
+</tr>
+</tbody>
+</table>
 <hr>
-<div class="right-small">Copyright 20xx Project xx, Updated: 2026/07/18 (Created: 2009/11/11)</div>
+<div class="right-small">Copyright 20xx Project xx, Updated: 2026/07/22 (Created: 2009/11/11)</div>
 </body>
 </html>

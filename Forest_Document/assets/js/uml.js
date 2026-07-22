@@ -99,6 +99,7 @@ function addDiagramControls(element, svg) {
     svg.style.width = `${initialWidth * scale}px`;
     svg.style.minWidth = "0px";
     svg.style.maxWidth = "none";
+    container.style.overscrollBehavior = scale <= 1 ? "auto" : "contain";
     buttons.reset.textContent = `${Math.round(scale * 100)}%`;
     buttons.out.disabled = scale <= minimumScale;
     buttons.in.disabled = scale >= maximumScale;
