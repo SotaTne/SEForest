@@ -1,0 +1,363 @@
+---
+config:
+  layout: elk
+  elk:
+    mergeEdges: false
+    nodePlacementStrategy: BRANDES_KOEPF
+    considerModelOrder: PREFER_EDGES
+  class:
+    defaultRenderer: elk
+    nodeSpacing: 55
+    rankSpacing: 80
+---
+classDiagram
+direction TB
+
+namespace Shared {
+  class Point {
+    <<value object>>
+    +x: float
+    +y: float
+  }
+  note for Point "Canvas上の座標を表す"
+
+  class BBox {
+    <<value object>>
+    +x: float
+    +y: float
+    +width: float
+    +height: float
+  }
+  note for BBox "位置と大きさだけを保持する矩形領域"
+
+  class LayoutStep {
+    <<value object>>
+    +index: int
+    +positions: dict~BaseNode, BBox~
+  }
+  note for LayoutStep "アニメーション1工程分の配置"
+
+  class Constants {
+    <<utility>>
+    +FONT_FAMILY: str = Serif
+    +FONT_SIZE: int = 12
+    +HORIZONTAL_SPACING: float = 25
+    +VERTICAL_SPACING: float = 2
+    +MIN_ZOOM_SCALE: float
+    +MAX_ZOOM_SCALE: float
+    +DRAG_THRESHOLD: float
+    +PLAYBACK_INTERVAL_MS: int
+  }
+  note for Constants "表示、整列、操作判定の既定値"
+}
+
+namespace Tree {
+  class BaseNode {
+    <<abstract>>
+    -text: str
+    -bbox: BBox
+    +rename(text: str) None
+    +children() tuple~BaseNode~
+  }
+  note for BaseNode "全ノードに共通する表示情報と操作"
+
+  class Node {
+    -childNodes: list~BaseNode~
+    +addChild(child: BaseNode) None
+    +children() tuple~BaseNode~
+  }
+  note for Node "1個以上の子を持つ中間ノード"
+
+  class Root {
+    -childNodes: list~BaseNode~
+    +addChild(child: BaseNode) None
+    +children() tuple~BaseNode~
+  }
+  note for Root "各木構造の表示開始点"
+
+  class Leaf {
+    +children() tuple~BaseNode~
+  }
+  note for Leaf "子を持たない末端ノード"
+}
+
+BaseNode <|-- Node
+BaseNode <|-- Root
+BaseNode <|-- Leaf
+BaseNode *-- BBox : bbox
+BaseNode "0..*" --o Node : childNodes
+BaseNode "0..*" --o Root : childNodes
+
+namespace ViewState {
+  class Desktop {
+    -windowSizeBBox: BBox
+    -windowCanvasBBox: BBox
+    -zoomScale: float
+    +resize(width: float, height: float) None
+    +pan(dx: float, dy: float) None
+    +zoomAt(anchor: Point, scaleDelta: float) None
+    +canvasToView(point: Point) Point
+    +viewToCanvas(point: Point) Point
+    +resetViewport() None
+  }
+  note for Desktop "表示範囲、スクロール位置、拡大率を管理"
+}
+
+Desktop *-- BBox : windowSizeBBox
+Desktop *-- BBox : windowCanvasBBox
+Desktop ..> Point : transforms
+
+LayoutStep o-- "0..*" BaseNode : positions
+LayoutStep o-- "0..*" BBox : positions
+
+namespace ParserComponent {
+  class Parser {
+    +parse(sourceText: str) list~BaseNode~
+    -splitSections(sourceText: str) tuple
+    -parseNodeRegistry(lines: list~str~) dict~str, BaseNode~
+    -parseTrees(lines: list~str~, registry: dict) list~BaseNode~
+    -nodeFor(name: str, registry: dict) BaseNode
+  }
+  note for Parser "trees節とnodes節を解析し、同名ノードを共有する"
+}
+
+Parser ..> BaseNode : creates
+Parser ..> Node : creates
+Parser ..> Root : creates
+Parser ..> Leaf : creates
+
+namespace Layout {
+  class LayoutCalculator {
+    -measuredSizeCache: dict~BaseNode, BBox~
+    -parentsByNode: dict~BaseNode, list[BaseNode]~
+    -layoutVersion: int
+    +createInitialSteps(nodes: list~BaseNode~, desktop: Desktop) list~LayoutStep~
+    +recalculate(nodes: list~BaseNode~, changedNode: BaseNode) list~LayoutStep~
+    -measure(node: BaseNode) BBox
+    -buildParentIndex(nodes: list~BaseNode~) None
+    -placeRoots(nodes: list~BaseNode~, viewport: BBox) list~LayoutStep~
+    -placeDescendants(root: BaseNode) list~LayoutStep~
+    -resolveSharedNodes(nodes: list~BaseNode~) list~LayoutStep~
+  }
+  note for LayoutCalculator "初期配置から完成配置までの工程を生成"
+
+  class GraphTraversal {
+    +rootNodes(nodes: list~BaseNode~) list~BaseNode~
+    +reachableFrom(start: BaseNode) list~BaseNode~
+    +edgesFrom(start: BaseNode) list~tuple~
+    +allEdges(nodes: list~BaseNode~) list~tuple~
+  }
+  note for GraphTraversal "循環と共有ノードを考慮してグラフを探索"
+
+  class BBoxCalculator {
+    +forNodes(nodes: list~BaseNode~) BBox
+    +forSubgraph(start: BaseNode) BBox
+  }
+  note for BBoxCalculator "全体または部分グラフの描画領域を算出"
+}
+
+LayoutCalculator ..> BaseNode : calculates
+LayoutCalculator ..> Desktop : reads viewport
+LayoutCalculator ..> LayoutStep : creates
+LayoutCalculator ..> Constants : reads spacing
+GraphTraversal ..> BaseNode : traverses
+BBoxCalculator ..> BaseNode : reads bbox
+BBoxCalculator ..> GraphTraversal : collects nodes
+BBoxCalculator ..> BBox : creates
+
+namespace ImageOutput {
+  class ImageRenderer {
+    -graphTraversal: GraphTraversal
+    -bboxCalculator: BBoxCalculator
+    -targetCanvas: object | None
+    +renderCanvas(nodes: list~BaseNode~, outputPath: Path) None
+    +renderSubgraph(start: BaseNode, outputPath: Path) None
+    -createTargetCanvas(bounds: BBox) object
+    -render(nodes: list~BaseNode~, bounds: BBox, targetCanvas: object, outputPath: Path) None
+    -drawEdges(nodes: list~BaseNode~, targetCanvas: object) None
+    -drawNodes(nodes: list~BaseNode~, targetCanvas: object) None
+  }
+  note for ImageRenderer "画像出力用Canvasを描画先としてPNG画像を生成"
+}
+
+ImageRenderer *-- GraphTraversal : graphTraversal
+ImageRenderer *-- BBoxCalculator : bboxCalculator
+ImageRenderer ..> BaseNode : renders
+ImageRenderer ..> BBox : clips
+
+namespace ModelComponent {
+  class ModelObserver {
+    <<interface>>
+    +update(model: Model, event: str) None
+  }
+  note for ModelObserver "Modelの変更通知を受け取る"
+
+  class NodeEditorState {
+    -selectedNode: BaseNode
+    -editingText: str
+    -popupBBox: BBox
+    +begin(node: BaseNode, popupBBox: BBox) None
+    +updateDraft(text: str) None
+    +commit() str
+    +cancel() None
+  }
+  note for NodeEditorState "選択ノードと未確定の編集内容を保持"
+
+  class Model {
+    -sourceText: str
+    -nodes: list~BaseNode~
+    -canvasBBox: BBox
+    -outputFile: Path | None
+    -desktop: Desktop
+    -nodeEditorState: NodeEditorState | None
+    -currentStep: int
+    -totalSteps: int
+    -isPlaying: bool
+    -layoutSteps: list~LayoutStep~
+    -observers: list~ModelObserver~
+    -parser: Parser
+    -layoutCalculator: LayoutCalculator
+    -bboxCalculator: BBoxCalculator
+    -imageRenderer: ImageRenderer
+    +loadFile(inputPath: Path) None
+    +loadText(sourceText: str) None
+    +selectNode(node: BaseNode, popupBBox: BBox) None
+    +clearSelection() None
+    +renameSelectedNode(text: str) None
+    +showStep(index: int) None
+    +showPreviousStep() None
+    +showNextStep() None
+    +setPlaying(isPlaying: bool) None
+    +exportCanvas(outputPath: Path) None
+    +exportSelectedSubgraph(outputPath: Path) None
+    +addObserver(observer: ModelObserver) None
+    +removeObserver(observer: ModelObserver) None
+    -replaceLayoutSteps(steps: list~LayoutStep~) None
+    -applyLayoutStep(step: LayoutStep) None
+    -updateCanvasBBox() None
+    -notifyObservers(event: str) None
+  }
+  note for Model "状態遷移とユースケースを集約する"
+}
+
+Model o-- "0..*" BaseNode : nodes
+Model *-- Desktop : desktop
+Model *-- "0..1" NodeEditorState : nodeEditorState
+Model *-- BBox : canvasBBox
+Model o-- "0..*" LayoutStep : layoutSteps
+Model o-- "0..*" ModelObserver : observers
+Model *-- Parser : parser
+Model *-- LayoutCalculator : layoutCalculator
+Model *-- BBoxCalculator : bboxCalculator
+Model *-- ImageRenderer : imageRenderer
+NodeEditorState --> BaseNode : selectedNode
+NodeEditorState *-- BBox : popupBBox
+
+namespace ViewComponent {
+  class NodeEditorPopupView {
+    -model: Model
+    -popupWidget: object
+    -textEntry: object
+    +show(state: NodeEditorState) None
+    +hide() None
+    +draftText() str
+    +update(model: Model, event: str) None
+  }
+  note for NodeEditorPopupView "ノード名編集と部分画像出力の小窓"
+
+  class CanvasPopupView {
+    -popupWidget: object
+    +show(position: Point) None
+    +hide() None
+  }
+  note for CanvasPopupView "Canvas全体の画像出力を行う小窓"
+
+  class DesktopView {
+    -model: Model
+    -rootWindow: object
+    -canvas: object
+    -nodeEditorPopupView: NodeEditorPopupView
+    -canvasPopupView: CanvasPopupView
+    -controller: Controller
+    +bindController(controller: Controller) None
+    +showFilePrompt() None
+    +chooseInputFile() Path | None
+    +chooseOutputFile() Path | None
+    +renderCanvas() None
+    +renderPlaybackControls() None
+    +nodeAt(viewPoint: Point) BaseNode | None
+    +update(model: Model, event: str) None
+    -drawEdges() None
+    -drawNodes() None
+  }
+  note for DesktopView "CustomTkinterのメイン画面とCanvasを表示"
+}
+
+ModelObserver <|.. DesktopView
+ModelObserver <|.. NodeEditorPopupView
+DesktopView ..> Model : renders
+NodeEditorPopupView ..> Model : renders
+NodeEditorPopupView ..> NodeEditorState : renders
+DesktopView *-- NodeEditorPopupView : nodeEditorPopupView
+DesktopView *-- CanvasPopupView : canvasPopupView
+DesktopView ..> Point : input coordinates
+DesktopView ..> BaseNode : hit testing
+
+namespace ControllerComponent {
+  class Controller {
+    -model: Model
+    -view: DesktopView
+    -pressPoint: Point | None
+    -lastDragPoint: Point | None
+    -isDragging: bool
+    -playbackJobId: str | None
+    +openFile(inputPath: Path) None
+    +handleDrop(paths: list~Path~) None
+    +handlePointerPress(point: Point) None
+    +handlePointerMove(point: Point) None
+    +handlePointerRelease(point: Point) None
+    +handleWheel(deltaX: float, deltaY: float) None
+    +handleZoom(anchor: Point, scaleDelta: float) None
+    +handleNodeClick(node: BaseNode, point: Point) None
+    +handleCanvasClick() None
+    +handleCanvasContextMenu(point: Point) None
+    +confirmRename(text: str) None
+    +cancelPopup() None
+    +exportCanvas(outputPath: Path) None
+    +exportSelectedSubgraph(outputPath: Path) None
+    +togglePlayback() None
+    +showPreviousStep() None
+    +showNextStep() None
+    +seekStep(index: int) None
+    -scheduleNextStep() None
+    -cancelScheduledStep() None
+  }
+  note for Controller "画面イベントをModelの操作へ変換"
+}
+
+Controller --> Model : updates
+Controller --> DesktopView : controls
+Controller ..> Point : pointer state
+Controller ..> BaseNode : selected node
+
+namespace ApplicationComponent {
+  class ForestApp {
+    -model: Model
+    -desktopView: DesktopView
+    -controller: Controller
+    +build() None
+    +run() None
+  }
+  note for ForestApp "MVC各要素を構成してアプリケーションを起動"
+}
+
+ForestApp *-- Model : model
+ForestApp *-- DesktopView : desktopView
+ForestApp *-- Controller : controller
+
+classDef mvc fill:#eaf2ff,stroke:#54749f,color:#20334d,stroke-width:1.5px
+classDef core fill:#fff8e8,stroke:#8a7446,color:#3f3522,stroke-width:1.5px
+classDef support fill:#f3f4f6,stroke:#6b7280,color:#27303f,stroke-width:1.5px
+cssClass "ForestApp,Model,NodeEditorState,Desktop,DesktopView,NodeEditorPopupView,CanvasPopupView,Controller,ModelObserver" mvc
+cssClass "BaseNode,Leaf,Node,Root,Parser,LayoutCalculator,BBoxCalculator,GraphTraversal,ImageRenderer" core
+cssClass "Point,BBox,LayoutStep,Constants" support
