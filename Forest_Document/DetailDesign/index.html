@@ -9,7 +9,25 @@
     <meta name="description" content="ソフトウェア工学IIのホームページ" />
     <meta name="author" content="AOKI Atsushi" />
     <link rel="stylesheet" href="../assets/css/docs.css" />
-    <title>ソフトウェア工学II「樹状整列」詳細設計書</title>
+    <link rel="stylesheet" href="../assets/css/uml.css" />
+    <style>
+      table.requirement-map {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 8px 0px 20px;
+      }
+      table.requirement-map th,
+      table.requirement-map td {
+        padding: 6px 8px;
+        border: 1px solid #cccccc;
+        vertical-align: top;
+      }
+      table.requirement-map th {
+        background-color: #eeeeee;
+        text-align: left;
+      }
+    </style>
+    <title>ソフトウェア工学II「樹状整列」詳細設計書（2026年7月28日時点）</title>
   </head>
   <body>
     <div id="menu">
@@ -29,13 +47,122 @@
       </ul>
     </div>
     <hr />
-    <h2>ソフトウェア工学II「樹状整列」詳細設計書</h2>
+    <h2>ソフトウェア工学II「樹状整列」詳細設計書（2026年7月28日時点）</h2>
     <div class="belt">
-      <h3><a id="KanseiSaseteKudasai">完成させてください</a></h3>
+      <h3><a id="SekkeiGaiyou">設計概要</a></h3>
     </div>
+    <p>
+      本詳細設計は、要求仕様書および2026年7月22日時点の基本設計を、
+      PythonとCustomTkinterで実装できる粒度へ具体化したものである。
+      クラスの責務、属性、公開メソッド、型、保持関係および実装上の依存関係を示す。
+    </p>
+    <p>
+      要求仕様書の命名方針に従い、クラス名にはアッパーキャメルケース、
+      メソッド名にはロワーキャメルケースを用いる。
+    </p>
+    <ul>
+      <li>
+        Parserはtrees節とnodes節を解析し、同じ名前のノードを共有するグラフを生成する。
+      </li>
+      <li>
+        LayoutCalculatorは初期配置から完成配置までをLayoutStepとして生成し、
+        Modelが現在の工程をノードへ適用する。
+      </li>
+      <li>
+        DesktopViewとNodeEditorPopupViewはModelObserverとして変更通知を受け、
+        Controllerは画面操作をModelのユースケースへ変換する。
+      </li>
+      <li>
+        ImageRendererはCanvas全体、または選択ノードから到達可能な部分グラフを
+        PNG画像として出力する。
+      </li>
+    </ul>
+    <div class="belt">
+      <h3><a id="ShousaiKousei">詳細構成</a></h3>
+    </div>
+    <p>
+      図のMermaidソースは
+      <a href="detail-design-2026-07-28.mmd"
+        ><code>detail-design-2026-07-28.mmd</code></a
+      >から読み込む。
+    </p>
+    <p>
+      外枠は実装時に一つの部品として扱う範囲を示す。
+      クラスはMVC関係を淡い青、グラフと処理に関するクラスを淡い黄、
+      値オブジェクトと定数を灰色で示す。関係線の色は基本設計図と共通である。
+    </p>
+    <p>
+      基本設計にない要素は、新しい機能ではなく実装粒度への具体化である。
+      Pointは画面操作と座標変換で使う点、LayoutStepは整列アニメーションの1工程分、
+      CanvasPopupViewはCanvas全体の画像出力小窓を表す。
+      NodeEditorStateは基本設計どおりModelが保持し、選択ノード、未確定の編集文字列、
+      小窓の表示領域を管理する。BBoxは基本設計に合わせ、
+      位置と大きさだけを保持する値オブジェクトとし、範囲計算はBBoxCalculatorなどの担当部品で行う。
+    </p>
+    <div class="belt">
+      <h3><a id="YoukyuuTaiou">要求対応</a></h3>
+    </div>
+    <table class="requirement-map" aria-label="要求と担当部品の対応">
+      <thead>
+        <tr>
+          <th scope="col">要求・操作</th>
+          <th scope="col">主な担当部品</th>
+          <th scope="col">実現内容</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ファイル読込</td>
+          <td>Application、Controller、Model、Parser</td>
+          <td>
+            Controllerが入力ファイルを受け取り、Modelがテキストを保持し、Parserがtrees節とnodes節からノード群を生成する。
+          </td>
+        </tr>
+        <tr>
+          <td>樹状整列</td>
+          <td>Model、Layout、Tree、Shared</td>
+          <td>
+            LayoutCalculatorがノードのBBoxを計算し、Modelが現在の配置をノードへ反映する。
+          </td>
+        </tr>
+        <tr>
+          <td>アニメーション</td>
+          <td>Controller、Model、Layout、View</td>
+          <td>
+            LayoutStepを工程単位の配置として保持し、Controllerの再生操作に応じてModelが工程を切り替え、Viewへ通知する。
+          </td>
+        </tr>
+        <tr>
+          <td>ノード名編集</td>
+          <td>Controller、Model、NodeEditorState、View、Tree</td>
+          <td>
+            ModelがNodeEditorStateを保持し、選択ノードと編集中の文字列を管理する。NodeEditorPopupViewはその状態を表示し、確定時にModelがノード名を更新する。
+          </td>
+        </tr>
+        <tr>
+          <td>部分画像出力</td>
+          <td>Model、ImageOutput、Layout、Tree</td>
+          <td>
+            ImageRendererが選択ノードから到達可能な部分グラフをGraphTraversalで集め、BBoxCalculatorで出力範囲を求め、画像出力用Canvasを描画先として画像化する。
+          </td>
+        </tr>
+        <tr>
+          <td>全体画像出力</td>
+          <td>View、Controller、Model、ImageOutput</td>
+          <td>
+            CanvasPopupViewが全体出力の操作を受け、Modelを通じてImageRendererが画像出力用Canvasへ全体を描画し、PNG画像として保存する。
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="mermaid-container uml-shared-aggregation">
+      <pre class="mermaid" data-mermaid-source="detail-design-2026-07-28.mmd">
+詳細設計図を読み込んでいます。</pre>
+    </div>
+    <script type="module" src="../assets/js/uml.js"></script>
     <hr />
     <div class="right-small">
-      Copyright 20xx Project xx, Updated: 2026/07/22 (Created: 2009/11/11)
+      Copyright 20xx Project xx, Updated: 2026/07/28 (Created: 2009/11/11)
     </div>
   </body>
 </html>
