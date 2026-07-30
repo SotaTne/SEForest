@@ -1,0 +1,77 @@
+---
+config:
+  layout: elk
+  elk:
+    mergeEdges: false
+    nodePlacementStrategy: BRANDES_KOEPF
+    considerModelOrder: PREFER_EDGES
+  class:
+    defaultRenderer: elk
+    nodeSpacing: 70
+    rankSpacing: 90
+---
+classDiagram
+direction TB
+%% display-width: 100%
+%% display-height: 620px
+
+class Application {
+  <<component>>
+}
+class Controller {
+  <<component>>
+}
+class View {
+  <<component>>
+}
+class Model {
+  <<component>>
+}
+class ViewState {
+  <<package>>
+}
+class Parser {
+  <<package>>
+}
+class Layout {
+  <<package>>
+}
+class ImageOutput {
+  <<package>>
+}
+class Tree {
+  <<package>>
+}
+class Shared {
+  <<package>>
+}
+
+Application --> Controller : creates
+Application --> View : creates
+Application --> Model : creates
+Controller --> View : controls
+Controller --> Model : updates
+View --> Model : reads and subscribes
+Model --> Parser : parses source
+Model --> Layout : calculates layout
+Model --> ImageOutput : exports image
+Model *-- ViewState : owns state
+Parser --> Tree : creates nodes
+Layout --> Tree : arranges nodes
+ImageOutput --> Tree : renders nodes
+Layout --> Shared : uses values
+ImageOutput --> Shared : uses values
+Tree --> Shared : uses BBox
+ViewState --> Shared : uses geometry
+
+note for Application "MVC各要素を構成して起動"
+note for Controller "画面操作をModelの操作へ変換"
+note for View "画面と小窓を表示"
+note for Model "状態遷移とユースケースを集約"
+
+classDef mvc fill:#eaf2ff,stroke:#54749f,color:#20334d,stroke-width:1.5px
+classDef core fill:#fff8e8,stroke:#8a7446,color:#3f3522,stroke-width:1.5px
+classDef support fill:#f3f4f6,stroke:#6b7280,color:#27303f,stroke-width:1.5px
+cssClass "Application,Controller,View,Model" mvc
+cssClass "Parser,Layout,ImageOutput,Tree" core
+cssClass "ViewState,Shared" support

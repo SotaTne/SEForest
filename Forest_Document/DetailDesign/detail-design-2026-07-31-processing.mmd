@@ -1,0 +1,73 @@
+---
+config:
+  layout: elk
+  class:
+    defaultRenderer: elk
+    nodeSpacing: 55
+    rankSpacing: 80
+---
+classDiagram
+direction TB
+%% display-width: 48%
+%% display-height: 520px
+
+class Parser {
+  +parse(sourceText: str) list~BaseNode~
+  -splitSections(sourceText: str) dict~str, list[str]~
+  -parseNodeLabels(lines: list~str~) dict~int, str~
+  -parseNodeRegistry(lines, branches, rootIds) dict~int, BaseNode~
+  -parseBranches(lines: list~str~) list~tuple~
+  -branchesFromTrees(lines, labels) tuple
+  -connectBranches(branches, registry) None
+  -parseTrees(lines, registry) None
+}
+
+class LayoutCalculator {
+  -measuredSizeCache: dict~BaseNode, BBox~
+  -parentsByNode: dict~BaseNode, list[BaseNode]~
+  -layoutVersion: int
+  +createInitialSteps(nodes, desktop) list~LayoutStep~
+  +recalculate(nodes, changedNode) list~LayoutStep~
+  -measure(node: BaseNode) BBox
+  -buildParentIndex(nodes) None
+  -placeRoots(nodes, viewport) list~LayoutStep~
+  -placeDescendants(root) list~LayoutStep~
+  -resolveSharedNodes(nodes) list~LayoutStep~
+}
+
+class GraphTraversal {
+  +rootNodes(nodes) list~BaseNode~
+  +reachableFrom(start) list~BaseNode~
+  +edgesFrom(start) list~tuple~
+  +allEdges(nodes) list~tuple~
+}
+
+class BBoxCalculator {
+  +forNodes(nodes) BBox
+  +forSubgraph(start) BBox
+}
+
+class ImageRenderer {
+  -graphTraversal: GraphTraversal
+  -bboxCalculator: BBoxCalculator
+  -targetCanvas: object | None
+  +renderCanvas(nodes, outputPath) None
+  +renderSubgraph(start, outputPath) None
+  -createTargetCanvas(bounds) object
+  -render(nodes, bounds, targetCanvas, outputPath) None
+  -drawEdges(nodes, targetCanvas) None
+  -drawNodes(nodes, targetCanvas) None
+}
+
+BBoxCalculator ..> GraphTraversal : collects nodes
+ImageRenderer *-- GraphTraversal : graphTraversal
+ImageRenderer *-- BBoxCalculator : bboxCalculator
+
+note for Parser "Forestテキストから共有ノードを含むグラフを生成"
+note for LayoutCalculator "初期配置から樹状配置までの工程を生成"
+note for GraphTraversal "循環と共有ノードを考慮して探索"
+note for BBoxCalculator "全体または部分グラフの描画領域を算出"
+note for ImageRenderer "Canvas全体または部分グラフをPNG画像へ出力"
+
+classDef core fill:#fff8e8,stroke:#8a7446,color:#3f3522,stroke-width:1.5px
+cssClass "Parser,LayoutCalculator,GraphTraversal,BBoxCalculator,ImageRenderer" core

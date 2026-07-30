@@ -1,0 +1,83 @@
+---
+config:
+  layout: elk
+  class:
+    defaultRenderer: elk
+    nodeSpacing: 55
+    rankSpacing: 80
+---
+classDiagram
+direction TB
+%% display-width: 48%
+%% display-height: 520px
+
+class EventEmitter~E~ {
+  -callbacks: dict~E, list[Callable[[], None]]~
+  +subscribe(event: E, callback: Callable[[], None]) None
+  +notify(event: E) None
+}
+
+class ModelEvent {
+  <<enumeration>>
+  NODES_CHANGED
+  LAYOUT_CHANGED
+  SELECTION_CHANGED
+  EDITOR_CHANGED
+  PLAYBACK_CHANGED
+  DESKTOP_CHANGED
+}
+
+class NodeEditorState {
+  -selectedNode: BaseNode
+  -editingText: str
+  -popupBBox: BBox
+  +begin(node: BaseNode, popupBBox: BBox) None
+  +updateDraft(text: str) None
+  +commit() str
+  +cancel() None
+}
+
+class Model {
+  +events: EventEmitter~ModelEvent~
+  -sourceText: str
+  -nodes: list~BaseNode~
+  -canvasBBox: BBox
+  -outputFile: Path | None
+  -desktop: Desktop
+  -nodeEditorState: NodeEditorState | None
+  -currentStep: int
+  -totalSteps: int
+  -isPlaying: bool
+  -layoutSteps: list~LayoutStep~
+  -parser: Parser
+  -layoutCalculator: LayoutCalculator
+  -bboxCalculator: BBoxCalculator
+  -imageRenderer: ImageRenderer
+  +loadFile(inputPath: Path) None
+  +loadText(sourceText: str) None
+  +selectNode(node: BaseNode, popupBBox: BBox) None
+  +clearSelection() None
+  +renameSelectedNode(text: str) None
+  +showStep(index: int) None
+  +showPreviousStep() None
+  +showNextStep() None
+  +setPlaying(isPlaying: bool) None
+  +exportCanvas(outputPath: Path) None
+  +exportSelectedSubgraph(outputPath: Path) None
+  -replaceLayoutSteps(steps: list~LayoutStep~) None
+  -applyLayoutStep(step: LayoutStep) None
+  -updateCanvasBBox() None
+  -notify(event: ModelEvent) None
+}
+
+Model *-- EventEmitter : events
+EventEmitter ..> ModelEvent : event type
+Model *-- "0..1" NodeEditorState : editor state
+
+note for EventEmitter "登録されたcallbackをイベント別に呼び出す"
+note for ModelEvent "Viewが再読込する状態領域"
+note for NodeEditorState "選択ノードと未確定の編集内容を保持"
+note for Model "状態遷移とユースケースを集約"
+
+classDef mvc fill:#eaf2ff,stroke:#54749f,color:#20334d,stroke-width:1.5px
+cssClass "EventEmitter,ModelEvent,NodeEditorState,Model" mvc
