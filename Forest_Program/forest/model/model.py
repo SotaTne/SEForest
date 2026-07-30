@@ -4,16 +4,17 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from forest.controller.command_port import ModelCommandPort
 from forest.image_output import ImageRenderer
 from forest.layout import BBoxCalculator, LayoutCalculator
 from forest.model.events import EventEmitter, ModelEvent
 from forest.model.node_editor_state import NodeEditorState
 from forest.parser import Parser
-from forest.shared import BBox, Desktop, LayoutStep, Point
+from forest.shared import BBox, Constants, Desktop, LayoutStep, Point
 from forest.tree import BaseNode
 
 
-class Model:
+class Model(ModelCommandPort):
     """MVCのViewから独立した状態遷移とユースケースを提供する。"""
 
     def __init__(
@@ -124,6 +125,27 @@ class Model:
         self._notify(ModelEvent.SELECTION_CHANGED)
         self._notify(ModelEvent.EDITOR_CHANGED)
 
+    def clearTree(self) -> None:
+        """読み込んだツリーと派生状態を破棄し、ファイル選択前へ戻す。"""
+
+        if not self._nodes and not self._sourceText:
+            return
+        self._sourceText = ""
+        self._nodes = []
+        self._canvasBBox = BBox(0.0, 0.0, 0.0, 0.0)
+        self._outputFile = None
+        self._nodeEditorState = None
+        self._currentStep = 0
+        self._totalSteps = 0
+        self._isPlaying = False
+        self._layoutSteps = []
+        self._desktop.resetViewport()
+        self._notify(ModelEvent.NODES_CHANGED)
+        self._notify(ModelEvent.SELECTION_CHANGED)
+        self._notify(ModelEvent.EDITOR_CHANGED)
+        self._notify(ModelEvent.PLAYBACK_CHANGED)
+        self._notify(ModelEvent.DESKTOP_CHANGED)
+
     def renameSelectedNode(self, text: str) -> None:
         """選択ノードを改名し、必要な配置を再計算する。"""
 
@@ -177,6 +199,12 @@ class Model:
             raise TypeError("isPlaying must be a boolean")
         if self._isPlaying == isPlaying:
             return
+        if isPlaying and self._totalSteps and self._currentStep == self._totalSteps - 1:
+            if self._totalSteps == 1 and self._nodes:
+                steps = self._layoutCalculator.createInitialSteps(self._nodes, self._desktop)
+                self._replaceLayoutSteps(steps)
+            else:
+                self.showStep(0)
         self._isPlaying = isPlaying
         self._notify(ModelEvent.PLAYBACK_CHANGED)
 
@@ -203,7 +231,18 @@ class Model:
     def panDesktop(self, dx: float, dy: float) -> None:
         """View座標の移動量で表示領域をパンする。"""
 
-        self._desktop.pan(dx, dy)
+        if not self._nodes:
+            return
+        viewport = self._desktop.windowCanvasBBox
+        scale = self._desktop.zoomScale
+        requestedX = viewport.x - dx / scale
+        requestedY = viewport.y - dy / scale
+        minimumX, maximumX, minimumY, maximumY = self._viewportLimits()
+        boundedX = min(maximumX, max(minimumX, requestedX))
+        boundedY = min(maximumY, max(minimumY, requestedY))
+        if boundedX == viewport.x and boundedY == viewport.y:
+            return
+        self._moveDesktopOriginTo(boundedX, boundedY)
         self._notify(ModelEvent.DESKTOP_CHANGED)
 
     def zoomDesktopAt(self, anchor: Point, scaleDelta: float) -> None:
@@ -212,6 +251,8 @@ class Model:
         if not isinstance(anchor, Point):
             raise TypeError("anchor must be a Point")
         self._desktop.zoomAt(anchor, scaleDelta)
+        if self._nodes:
+            self._clampDesktopViewport()
         self._notify(ModelEvent.DESKTOP_CHANGED)
 
     def resetDesktopViewport(self) -> None:
@@ -237,6 +278,32 @@ class Model:
 
     def _updateCanvasBBox(self) -> None:
         self._canvasBBox = self._bboxCalculator.forNodes(self._nodes)
+
+    def _viewportLimits(self) -> tuple[float, float, float, float]:
+        viewport = self._desktop.windowCanvasBBox
+        canvasMargin = Constants.CANVAS_VIEWPORT_MARGIN / self._desktop.zoomScale
+        leftAlignedX = self._canvasBBox.x - canvasMargin
+        rightAlignedX = self._canvasBBox.x + self._canvasBBox.width + canvasMargin - viewport.width
+        topAlignedY = self._canvasBBox.y - canvasMargin
+        bottomAlignedY = self._canvasBBox.y + self._canvasBBox.height + canvasMargin - viewport.height
+        return (
+            min(leftAlignedX, rightAlignedX),
+            max(leftAlignedX, rightAlignedX),
+            min(topAlignedY, bottomAlignedY),
+            max(topAlignedY, bottomAlignedY),
+        )
+
+    def _clampDesktopViewport(self) -> None:
+        viewport = self._desktop.windowCanvasBBox
+        minimumX, maximumX, minimumY, maximumY = self._viewportLimits()
+        boundedX = min(maximumX, max(minimumX, viewport.x))
+        boundedY = min(maximumY, max(minimumY, viewport.y))
+        self._moveDesktopOriginTo(boundedX, boundedY)
+
+    def _moveDesktopOriginTo(self, x: float, y: float) -> None:
+        viewport = self._desktop.windowCanvasBBox
+        scale = self._desktop.zoomScale
+        self._desktop.pan((viewport.x - x) * scale, (viewport.y - y) * scale)
 
     def _notify(self, event: ModelEvent) -> None:
         self.events.notify(event)
