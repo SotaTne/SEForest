@@ -9,7 +9,6 @@ from forest.parser import Parser
 from forest.shared import BBox, Constants
 from forest.tree import Leaf, Node, Root
 
-
 REQUIREMENT_TEXTS = Path(__file__).parents[3] / "Forest_Document" / "Requirement" / "texts"
 
 
