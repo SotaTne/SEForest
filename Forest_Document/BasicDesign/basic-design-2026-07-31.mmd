@@ -102,8 +102,11 @@ class Constants {
   <<utility>>
   +horizontalSpacing: float
   +verticalSpacing: float
+  +canvasViewportMargin: float
+  +playbackStepIntervalMs: int
+  +selectedNodeColors: colors by node type
 }
-note for Constants "整列間隔の既定値を保持（横25px、縦2px）"
+note for Constants "整列間隔、1step 50msの再生間隔、Canvas移動余白、Root・Node・Leaf別の選択色を共有"
 
 class Parser
 note for Parser "元テキストをノード一覧へ変換"
@@ -141,34 +144,70 @@ ImageRenderer ..> BBoxCalculator : image bounds
 
 class DesktopView {
   -model: Model
+  -scene: QGraphicsScene
+  -canvas: DesktopGraphicsView
   -nodeEditorPopupView: NodeEditorPopupView
+  -canvasPopupView: CanvasPopupView
 }
-note for DesktopView "メイン画面とキャンバスを表示"
+note for DesktopView "PySide6のメイン画面とGraphics Sceneを表示"
+
+class DesktopGraphicsView
+note for DesktopGraphicsView "ホイール、ピンチ、DnD、ポインター入力を受け取る"
+
+class CanvasRenderer
+note for CanvasRenderer "Modelの状態をQGraphicsItemへ差分反映"
+
+class NodeGraphicsItem
+note for NodeGraphicsItem "ノードの背景、枠線、文字列を一体表示"
 
 class NodeEditorPopupView
 note for NodeEditorPopupView "選択ノードの編集画面を表示"
 
+class CanvasPopupView
+note for CanvasPopupView "Control+左クリックまたは右クリックで開き、Canvas全体の画像出力とツリー削除を表示"
+
+class ControllerInputPort {
+  <<interface>>
+  +clearTree() None
+}
+note for ControllerInputPort "ViewからControllerへ送る入力メッセージの受信口"
+
+class ModelCommandPort {
+  <<interface>>
+  +clearTree() None
+}
+note for ModelCommandPort "ControllerからModelへ送る更新メッセージの受信口"
+
 class Controller
-note for Controller "操作をモデルの更新へ変換"
+note for Controller "入力を薄く正規化し、Model用メッセージへ変換"
 
 class ForestApp {
+  -application: QApplication
   -model: Model
   -desktopView: DesktopView
   -controller: Controller
+  +build() None
+  +run() None
 }
 note for ForestApp "MVC各要素を構成して起動"
 
 DesktopView --> EventEmitter : subscribes
-NodeEditorPopupView --> EventEmitter : subscribes
 DesktopView ..> Model : renders
-NodeEditorPopupView ..> Model : renders
 DesktopView *-- NodeEditorPopupView : nodeEditorPopupView
-Controller --> Model : updates
+DesktopView *-- CanvasPopupView : canvasPopupView
+DesktopView *-- DesktopGraphicsView : canvas
+DesktopView *-- CanvasRenderer : renderer
+DesktopGraphicsView --> ControllerInputPort : sends input
+CanvasRenderer *-- NodeGraphicsItem : node items
+DesktopView --> ControllerInputPort : sends input
+Controller ..|> ControllerInputPort : receives input
+Controller --> ModelCommandPort : sends messages
+Model ..|> ModelCommandPort : receives messages
 ForestApp *-- Model : model
 ForestApp *-- DesktopView : desktopView
 ForestApp *-- Controller : controller
 
 classDef mvc fill:#eaf2ff,stroke:#54749f,color:#20334d,stroke-width:1.5px
 classDef core fill:#fff8e8,stroke:#8a7446,color:#3f3522,stroke-width:1.5px
-cssClass "ForestApp,Model,ModelEvent,EventEmitter,NodeEditorState,Desktop,DesktopView,NodeEditorPopupView,Controller" mvc
+cssClass "ForestApp,Model,ModelCommandPort,ControllerInputPort,ModelEvent,EventEmitter,NodeEditorState,Desktop,DesktopView,DesktopGraphicsView,CanvasRenderer,NodeGraphicsItem,NodeEditorPopupView,CanvasPopupView,Controller" mvc
 cssClass "BBox,BaseNode,Leaf,Node,Root,Constants,Parser,LayoutCalculator,BBoxCalculator,GraphTraversal,ImageRenderer" core
