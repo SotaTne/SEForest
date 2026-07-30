@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 Forest_Program/.pyinstaller-build
+Forest_Program/build/
 dist
 dist-ssr
 docs/.vitepress/dist

@@ -3,9 +3,6 @@
 import sys
 from pathlib import Path
 
-from PyInstaller.utils.hooks import collect_data_files
-
-
 app_dir = Path(SPECPATH).resolve()
 
 
@@ -25,8 +22,8 @@ def collect_directory(directory_name):
 
 datas = []
 datas += collect_directory("assets")
-datas += collect_data_files("customtkinter")
-datas += collect_data_files("tkinterdnd2")
+datas += collect_directory("THIRD_PARTY_LICENSES")
+datas.append((str(app_dir / "LICENSE"), "."))
 
 a = Analysis(
     [str(app_dir / "main.py")],
@@ -37,7 +34,7 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=["tkinter", "customtkinter", "tkinterdnd2"],
     noarchive=False,
     optimize=0,
 )
