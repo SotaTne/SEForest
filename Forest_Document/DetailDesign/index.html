@@ -62,11 +62,15 @@
     </p>
     <ul>
       <li>
-        Parserはtrees節とnodes節を解析し、同じ名前のノードを共有するグラフを生成する。
+        Parserはtrees節、nodes節およびbranches節を解析する。
+        branches節がある場合はnodes節のIDを同一性として接続し、
+        branches節がない場合はtrees節の同名ノードを共有するグラフを生成する。
       </li>
       <li>
         LayoutCalculatorは初期配置から完成配置までをLayoutStepとして生成し、
-        Modelが現在の工程をノードへ適用する。
+        Modelが現在の工程をノードへ適用する。名称変更後は、同じ層の最大幅が
+        変わらない場合に変更ノードだけを差分更新し、影響が広がる場合は全体を再計算する。
+        完成配置では木ごとに領域を分け、親を子ノード群の中央へ配置する。
       </li>
       <li>
         DesktopViewとNodeEditorPopupViewはModelObserverとして変更通知を受け、
@@ -115,7 +119,7 @@
           <td>ファイル読込</td>
           <td>Application、Controller、Model、Parser</td>
           <td>
-            Controllerが入力ファイルを受け取り、Modelがテキストを保持し、Parserがtrees節とnodes節からノード群を生成する。
+            Controllerが入力ファイルを受け取り、Modelがテキストを保持し、Parserがtrees節、nodes節およびbranches節からノード群を生成する。
           </td>
         </tr>
         <tr>
@@ -162,7 +166,7 @@
     <script type="module" src="../assets/js/uml.js"></script>
     <hr />
     <div class="right-small">
-      Copyright 20xx Project xx, Updated: 2026/07/28 (Created: 2009/11/11)
+      Copyright 20xx Project xx, Updated: 2026/07/30 (Created: 2009/11/11)
     </div>
   </body>
 </html>
