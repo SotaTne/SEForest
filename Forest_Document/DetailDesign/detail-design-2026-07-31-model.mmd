@@ -12,7 +12,7 @@ direction TB
 %% display-height: 520px
 
 class EventEmitter~E~ {
-  -callbacks: dict~E, list[Callable[[], None]]~
+  -callbacks: dict[E, list[Callable[[], None]]]
   +subscribe(event: E, callback: Callable[[], None]) None
   +notify(event: E) None
 }
@@ -64,6 +64,10 @@ class Model {
   +setPlaying(isPlaying: bool) None
   +exportCanvas(outputPath: Path) None
   +exportSelectedSubgraph(outputPath: Path) None
+  +resizeDesktop(width: float, height: float) None
+  +panDesktop(dx: float, dy: float) None
+  +zoomDesktopAt(anchor: Point, scaleDelta: float) None
+  +resetDesktopViewport() None
   -replaceLayoutSteps(steps: list~LayoutStep~) None
   -applyLayoutStep(step: LayoutStep) None
   -updateCanvasBBox() None
@@ -74,7 +78,7 @@ Model *-- EventEmitter : events
 EventEmitter ..> ModelEvent : event type
 Model *-- "0..1" NodeEditorState : editor state
 
-note for EventEmitter "登録されたcallbackをイベント別に呼び出す"
+note for EventEmitter "イベントごとに複数のcallbackを保持し、登録順に呼び出す"
 note for ModelEvent "Viewが再読込する状態領域"
 note for NodeEditorState "選択ノードと未確定の編集内容を保持"
 note for Model "状態遷移とユースケースを集約"

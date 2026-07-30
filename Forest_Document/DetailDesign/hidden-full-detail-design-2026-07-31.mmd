@@ -136,7 +136,7 @@ namespace ImageOutput {
 
 namespace ModelComponent {
   class EventEmitter~E~ {
-    -callbacks: dict~E, list[Callable[[], None]]~
+    -callbacks: dict[E, list[Callable[[], None]]]
     +subscribe(event: E, callback: Callable[[], None]) None
     +notify(event: E) None
   }
@@ -185,6 +185,10 @@ namespace ModelComponent {
     +setPlaying(isPlaying: bool) None
     +exportCanvas(outputPath: Path) None
     +exportSelectedSubgraph(outputPath: Path) None
+    +resizeDesktop(width: float, height: float) None
+    +panDesktop(dx: float, dy: float) None
+    +zoomDesktopAt(anchor: Point, scaleDelta: float) None
+    +resetDesktopViewport() None
     -replaceLayoutSteps(steps: list~LayoutStep~) None
     -applyLayoutStep(step: LayoutStep) None
     -updateCanvasBBox() None
@@ -312,7 +316,7 @@ note for Desktop "表示範囲、スクロール位置、拡大率を管理"
 note for Parser "Forestテキストから共有ノードを含むグラフを生成"
 note for LayoutCalculator "初期配置から樹状配置までの工程を生成"
 note for ImageRenderer "Canvas全体または部分グラフをPNG画像へ出力"
-note for EventEmitter "登録されたcallbackをイベント別に呼び出す"
+note for EventEmitter "イベントごとに複数のcallbackを保持し、登録順に呼び出す"
 note for ModelEvent "Viewが再読込する状態領域"
 note for Model "状態遷移とユースケースを集約"
 note for DesktopView "メイン画面とCanvasを表示"
