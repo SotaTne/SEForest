@@ -47,6 +47,7 @@ namespace Shared {
     +MAX_ZOOM_SCALE: float
     +DRAG_THRESHOLD: float
     +PLAYBACK_INTERVAL_MS: int
+    +loadSerifFont() object
   }
   note for Constants "表示、整列、操作判定の既定値"
 }
@@ -66,7 +67,7 @@ namespace Tree {
     +addChild(child: BaseNode) None
     +children() tuple~BaseNode~
   }
-  note for Node "1個以上の子を持つ中間ノード"
+  note for Node "構築中に子を追加し、解析完了時に1個以上の子を持つ中間ノード"
 
   class Root {
     -childNodes: list~BaseNode~
@@ -113,12 +114,16 @@ LayoutStep o-- "0..*" BBox : positions
 namespace ParserComponent {
   class Parser {
     +parse(sourceText: str) list~BaseNode~
-    -splitSections(sourceText: str) tuple
-    -parseNodeRegistry(lines: list~str~) dict~str, BaseNode~
-    -parseTrees(lines: list~str~, registry: dict) list~BaseNode~
+    -splitSections(sourceText: str) dict~str, list[str]~
+    -parseNodeLabels(lines: list~str~) dict~int, str~
+    -parseNodeRegistry(lines: list~str~, branches: list[tuple], rootIds: set[int] | None) dict~int, BaseNode~
+    -parseBranches(lines: list~str~) list~tuple~
+    -branchesFromTrees(lines: list~str~, labels: dict) tuple
+    -connectBranches(branches: list~tuple~, registry: dict) None
+    -parseTrees(lines: list~str~, registry: dict) None
     -nodeFor(name: str, registry: dict) BaseNode
   }
-  note for Parser "trees節とnodes節を解析し、同名ノードを共有する"
+  note for Parser "branchesありはIDで接続し、branchesなしはtrees節の同名ノードを共有する"
 }
 
 Parser ..> BaseNode : creates
@@ -139,7 +144,7 @@ namespace Layout {
     -placeDescendants(root: BaseNode) list~LayoutStep~
     -resolveSharedNodes(nodes: list~BaseNode~) list~LayoutStep~
   }
-  note for LayoutCalculator "初期配置から完成配置までの工程を生成"
+  note for LayoutCalculator "木ごとに親を子の中央へ配置する工程を生成し、影響範囲に応じて差分または全体を再計算"
 
   class GraphTraversal {
     +rootNodes(nodes: list~BaseNode~) list~BaseNode~
@@ -177,7 +182,7 @@ namespace ImageOutput {
     -drawEdges(nodes: list~BaseNode~, targetCanvas: object) None
     -drawNodes(nodes: list~BaseNode~, targetCanvas: object) None
   }
-  note for ImageRenderer "画像出力用Canvasを描画先としてPNG画像を生成"
+  note for ImageRenderer "到達可能な全ノードを画像出力用Canvasへ描画してPNG画像を生成"
 }
 
 ImageRenderer *-- GraphTraversal : graphTraversal

@@ -94,7 +94,10 @@
     </p>
     <ul>
       <li>
-        パーサーはテキストをノード群へ変換する。初期表示ではノードを縦方向へ並べ、
+        パーサーはtrees節、nodes節およびbranches節をノード群へ変換する。
+        nodes節のIDをノードの同一性、branches節を接続関係として扱う。
+        branches節がない場合は、trees節の同名ノードを共有する。
+        初期表示ではノードを縦方向へ並べ、
         ウィンドウのCanvas表示範囲に応じて次の列へ送る。
       </li>
       <li>
@@ -345,7 +348,7 @@
     </table>
     <hr />
     <div class="right-small">
-      Copyright 20xx Project xx, Updated: 2026/07/22 (Created: 2009/11/11)
+      Copyright 20xx Project xx, Updated: 2026/07/30 (Created: 2009/11/11)
     </div>
   </body>
 </html>
