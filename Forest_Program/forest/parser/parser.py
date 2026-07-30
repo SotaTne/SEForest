@@ -1,4 +1,4 @@
-"""Create a graph with shared nodes from trees, nodes, and branches sections."""
+"""trees、nodes、branchesの各セクションから共有ノードを含むグラフを生成する。"""
 
 from __future__ import annotations
 
@@ -8,13 +8,30 @@ from forest.tree import BaseNode, Leaf, Node, Root
 
 
 class ParseError(ValueError):
-    """Raised when Forest text has an invalid structure."""
+    """Forestテキストの構造が不正な場合に送出する例外。"""
 
 
 class Parser:
-    """Parse the Forest text format used by the requirement samples."""
+    """要求仕様書のサンプルで使用されるForestテキスト形式を解析する。"""
 
     def parse(self, sourceText: str) -> list[BaseNode]:
+        """Forestテキストを解析し、木構造ごとの開始ノードを返す。
+
+        branchesセクションが省略された場合は、treesセクションのインデント表現から
+        親子関係を復元する。同じノードIDへの参照には同一インスタンスを使用するため、
+        複数の親を持つ共有ノードも保持できる。
+
+        Args:
+            sourceText: 解析対象のForestテキスト。
+
+        Returns:
+            解析された木構造の開始ノード一覧。空文字列の場合は空の一覧。
+
+        Raises:
+            TypeError: ``sourceText`` が文字列ではない場合。
+            ParseError: 必須セクションの不足や定義形式の誤りがある場合。
+        """
+
         if not isinstance(sourceText, str):
             raise TypeError("sourceText must be a string")
         if not sourceText.strip():
@@ -40,6 +57,8 @@ class Parser:
         return roots
 
     def _splitSections(self, sourceText: str) -> dict[str, list[str]]:
+        """入力テキストをセクション名ごとの行一覧へ分割する。"""
+
         sections: dict[str, list[str]] = {}
         currentSection: str | None = None
         for rawLine in sourceText.splitlines():
@@ -61,6 +80,8 @@ class Parser:
         branches: list[tuple[int, int]],
         rootIds: set[int] | None = None,
     ) -> dict[int, BaseNode]:
+        """接続関係を基に各IDのノード種別を判定し、ノードを生成する。"""
+
         labels = self._parseNodeLabels(lines)
         outgoing = {parentId for parentId, _ in branches}
         incoming = {childId for _, childId in branches}
@@ -76,6 +97,8 @@ class Parser:
         return registry
 
     def _parseNodeLabels(self, lines: Iterable[str]) -> dict[int, str]:
+        """nodesセクションからノードIDと表示名の対応を読み取る。"""
+
         labels: dict[int, str] = {}
         for line in lines:
             parts = [part.strip() for part in line.split(",", maxsplit=1)]
@@ -95,6 +118,8 @@ class Parser:
         lines: Iterable[str],
         labels: dict[int, str],
     ) -> tuple[list[tuple[int, int]], set[int]]:
+        """treesセクションの階層表現から接続関係とルートIDを復元する。"""
+
         nodeIdsByName: dict[str, list[int]] = {}
         for nodeId, label in labels.items():
             nodeIdsByName.setdefault(label, []).append(nodeId)
@@ -125,6 +150,8 @@ class Parser:
         return branches, rootIds
 
     def _parseBranches(self, lines: Iterable[str]) -> list[tuple[int, int]]:
+        """branchesセクションから親IDと子IDの組を読み取る。"""
+
         branches: list[tuple[int, int]] = []
         for line in lines:
             parts = [part.strip() for part in line.split(",")]
@@ -141,6 +168,8 @@ class Parser:
         branches: Iterable[tuple[int, int]],
         registry: dict[int, BaseNode],
     ) -> None:
+        """IDで表された接続関係をノードインスタンスへ反映する。"""
+
         for parentId, childId in branches:
             try:
                 parent = registry[parentId]
@@ -152,6 +181,8 @@ class Parser:
             parent.addChild(child)
 
     def _parseTrees(self, lines: Iterable[str], registry: dict[int, BaseNode]) -> None:
+        """treesセクションの階層表現をノードインスタンスへ反映する。"""
+
         nodesByName: dict[str, list[BaseNode]] = {}
         for node in registry.values():
             nodesByName.setdefault(node.text, []).append(node)
@@ -179,12 +210,16 @@ class Parser:
             stack[depth:] = [node]
 
     def _nodeFor(self, name: str, registry: dict[str, BaseNode]) -> BaseNode:
+        """表示名に対応するノードを返し、未定義の場合は解析エラーにする。"""
+
         try:
             return registry[name]
         except KeyError as error:
             raise ParseError(f"tree references unknown node: {name}") from error
 
     def _treeLine(self, line: str) -> tuple[int, str]:
+        """木構造の1行から深さとノード名を取り出す。"""
+
         depth = line.count("|--")
         name = line.split("|--")[-1].strip()
         if not name:

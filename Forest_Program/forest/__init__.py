@@ -1,1 +1,1 @@
-"""SEForest domain logic."""
+"""SEForestのドメインロジックを提供するパッケージ。"""

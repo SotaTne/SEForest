@@ -1,4 +1,4 @@
-"""Calculate drawing bounds for complete and partial graphs."""
+"""グラフ全体または部分グラフの描画範囲を計算する。"""
 
 from collections.abc import Iterable
 
@@ -8,12 +8,14 @@ from forest.tree import BaseNode
 
 
 class BBoxCalculator:
-    """Calculate the union of node bounding boxes."""
+    """複数ノードの境界矩形を包含する最小の矩形を計算する。"""
 
     def __init__(self, graphTraversal: GraphTraversal | None = None) -> None:
         self._graphTraversal = graphTraversal or GraphTraversal()
 
     def forNodes(self, nodes: Iterable[BaseNode]) -> BBox:
+        """指定されたノードと、その子孫すべてを含む描画範囲を返す。"""
+
         allNodes: list[BaseNode] = []
         seen: set[int] = set()
         for node in nodes:
@@ -24,9 +26,13 @@ class BBoxCalculator:
         return self._bounds(allNodes)
 
     def forSubgraph(self, start: BaseNode) -> BBox:
+        """開始ノードから到達できる部分グラフの描画範囲を返す。"""
+
         return self._bounds(self._graphTraversal.reachableFrom(start))
 
     def _bounds(self, nodes: Iterable[BaseNode]) -> BBox:
+        """指定ノードの境界矩形を結合する。ノードがなければ空の矩形を返す。"""
+
         boxes = [node.bbox for node in nodes]
         if not boxes:
             return BBox(0.0, 0.0, 0.0, 0.0)

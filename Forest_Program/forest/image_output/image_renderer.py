@@ -1,4 +1,4 @@
-"""Render graph nodes and edges to a headless Pillow canvas."""
+"""画面表示に依存せず、Pillowのキャンバスへグラフのノードと辺を描画する。"""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from forest.tree import BaseNode, Leaf, Root
 
 
 class ImageRenderer:
-    """Render the complete canvas or a selected subgraph as PNG."""
+    """キャンバス全体または選択した部分グラフをPNG画像として出力する。"""
 
     def __init__(
         self,
@@ -25,6 +25,8 @@ class ImageRenderer:
         self._targetCanvas: Image.Image | None = None
 
     def renderCanvas(self, nodes: list[BaseNode], outputPath: Path) -> None:
+        """指定した開始ノードから到達できるグラフ全体をPNG画像へ保存する。"""
+
         allNodes: list[BaseNode] = []
         seen: set[int] = set()
         for start in nodes:
@@ -36,11 +38,15 @@ class ImageRenderer:
         self._render(allNodes, bounds, self._createTargetCanvas(bounds), outputPath)
 
     def renderSubgraph(self, start: BaseNode, outputPath: Path) -> None:
+        """指定したノードを起点とする部分グラフをPNG画像へ保存する。"""
+
         nodes = self._graphTraversal.reachableFrom(start)
         bounds = self._bboxCalculator.forSubgraph(start)
         self._render(nodes, bounds, self._createTargetCanvas(bounds), outputPath)
 
     def _createTargetCanvas(self, bounds: BBox) -> Image.Image:
+        """描画範囲と余白を含む出力用キャンバスを生成する。"""
+
         width = max(1, int(round(bounds.width)) + Constants.IMAGE_PADDING * 2)
         height = max(1, int(round(bounds.height)) + Constants.IMAGE_PADDING * 2)
         self._targetCanvas = Image.new("RGB", (width, height), Constants.IMAGE_BACKGROUND_COLOR)
@@ -53,6 +59,8 @@ class ImageRenderer:
         targetCanvas: Image.Image,
         outputPath: Path,
     ) -> None:
+        """辺、ノードの順で描画し、出力先の親フォルダを作成して保存する。"""
+
         nodeList = list(nodes)
         draw = ImageDraw.Draw(targetCanvas)
         offsetX = Constants.IMAGE_PADDING - bounds.x
@@ -69,6 +77,8 @@ class ImageRenderer:
         offsetX: float,
         offsetY: float,
     ) -> None:
+        """各辺を親ノードの右端から子ノードの左端へ描画する。"""
+
         for parent, child in self._graphTraversal.allEdges(nodes):
             start = (
                 parent.bbox.x + parent.bbox.width + offsetX,
@@ -84,6 +94,8 @@ class ImageRenderer:
         offsetX: float,
         offsetY: float,
     ) -> None:
+        """ノード種別に応じた色で矩形と表示文字列を描画する。"""
+
         font = Constants.loadSerifFont()
         for node in nodes:
             box = node.bbox

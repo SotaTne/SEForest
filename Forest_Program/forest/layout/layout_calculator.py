@@ -1,4 +1,4 @@
-"""Generate animation steps from an initial flow to a layered graph layout."""
+"""全ノードの初期配置から階層的な樹状配置までのアニメーション段階を生成する。"""
 
 from __future__ import annotations
 
@@ -12,14 +12,17 @@ from forest.tree import BaseNode
 
 
 class DesktopState(Protocol):
-    """The viewport information required from the separately implemented MVC state."""
+    """別途実装されるMVCの状態から受け取る表示領域情報のインターフェース。"""
 
     @property
-    def windowCanvasBBox(self) -> BBox: ...
+    def windowCanvasBBox(self) -> BBox:
+        """ウィンドウ内でノードを配置できるキャンバス領域を返す。"""
+
+        ...
 
 
 class LayoutCalculator:
-    """Create deterministic layout steps while handling cycles and shared nodes."""
+    """循環と共有ノードを考慮し、再現可能な配置段階を生成する。"""
 
     def __init__(self) -> None:
         self._measuredSizeCache: dict[BaseNode, BBox] = {}
@@ -27,6 +30,20 @@ class LayoutCalculator:
         self._layoutVersion = 0
 
     def createInitialSteps(self, nodes: list[BaseNode], desktop: DesktopState) -> list[LayoutStep]:
+        """初期表示から樹状整列までの配置段階を生成する。
+
+        最初の段階には全ノードを表示領域へ順番に並べた位置を格納し、その後は
+        深さの浅い層から最終位置へ移動させた状態を追加する。Controllerは返された
+        段階を順番にViewへ反映することで、樹状に整列するアニメーションを実現できる。
+
+        Args:
+            nodes: 配置対象となる木構造の開始ノード一覧。
+            desktop: 配置可能なキャンバス領域を提供するMVC側の状態。
+
+        Returns:
+            時系列順の配置段階。対象ノードがない場合は空の一覧。
+        """
+
         allNodes = self._allNodes(nodes)
         if not allNodes:
             return []
@@ -46,6 +63,12 @@ class LayoutCalculator:
         return steps
 
     def recalculate(self, nodes: list[BaseNode], changedNode: BaseNode) -> list[LayoutStep]:
+        """表示名が変更されたノードの大きさと配置を再計算する。
+
+        変更後も同じ層の最大幅が変わらない場合は対象ノードだけを更新し、層幅が
+        変わる場合は全体を再配置する。
+        """
+
         self._buildParentIndex(nodes)
         allNodes = self._allNodes(nodes)
         if not allNodes:
@@ -84,6 +107,8 @@ class LayoutCalculator:
         return [LayoutStep(self._layoutVersion, positions)]
 
     def _measure(self, node: BaseNode) -> BBox:
+        """フォントの描画範囲と余白からノードの表示サイズを求める。"""
+
         cached = self._measuredSizeCache.get(node)
         if cached is not None:
             return cached
@@ -97,17 +122,23 @@ class LayoutCalculator:
         return measured
 
     def _buildParentIndex(self, nodes: list[BaseNode]) -> None:
+        """共有ノードを判定できるよう、子ノードから親ノードへの索引を構築する。"""
+
         parents: dict[BaseNode, list[BaseNode]] = defaultdict(list)
         for parent, child in GraphTraversal().allEdges(nodes):
             parents[child].append(parent)
         self._parentsByNode = dict(parents)
 
     def _placeRoots(self, nodes: list[BaseNode], viewport: BBox) -> list[LayoutStep]:
+        """最終配置のうちルート層だけを配置段階として返す。"""
+
         positions, depths = self._hierarchicalPositions(nodes, viewport)
         rootPositions = {node: box for node, box in positions.items() if depths[node] == 0}
         return [LayoutStep(self._layoutVersion, rootPositions)]
 
     def _placeDescendants(self, root: BaseNode) -> list[LayoutStep]:
+        """指定ルートの子孫を深さごとの配置段階として返す。"""
+
         positions, depths = self._hierarchicalPositions([root], root.bbox)
         return [
             LayoutStep(
@@ -118,11 +149,15 @@ class LayoutCalculator:
         ]
 
     def _resolveSharedNodes(self, nodes: list[BaseNode]) -> list[LayoutStep]:
+        """複数の親を持つ共有ノードの現在位置を配置段階として返す。"""
+
         del nodes
         sharedNodes = {node for node, parents in self._parentsByNode.items() if len(parents) > 1}
         return [LayoutStep(self._layoutVersion, {node: node.bbox for node in sharedNodes})]
 
     def _allNodes(self, nodes: Iterable[BaseNode]) -> list[BaseNode]:
+        """複数の開始ノードから到達可能な全ノードを重複なく返す。"""
+
         result: list[BaseNode] = []
         seen: set[int] = set()
         for start in nodes:
@@ -133,6 +168,8 @@ class LayoutCalculator:
         return result
 
     def _initialPositions(self, nodes: list[BaseNode], viewport: BBox) -> dict[BaseNode, BBox]:
+        """全ノードの初期位置を縦方向へ並べ、表示領域を超える場合は次の列へ送る。"""
+
         positions: dict[BaseNode, BBox] = {}
         x = viewport.x
         y = viewport.y
@@ -154,6 +191,12 @@ class LayoutCalculator:
         nodes: list[BaseNode],
         viewport: BBox,
     ) -> tuple[dict[BaseNode, BBox], dict[BaseNode, int]]:
+        """親子関係に基づく階層配置と各ノードの深さを計算する。
+
+        親は可能な限り最初と最後の子の中央へ配置する。循環を検出した場合は
+        探索中のノードを現在層の空き位置へ置き、再帰が終了しない状態を防ぐ。
+        """
+
         allNodes = self._allNodes(nodes)
         depths = self._depthsFor(nodes)
 
@@ -173,6 +216,8 @@ class LayoutCalculator:
         inProgress: set[BaseNode] = set()
 
         def placeNode(node: BaseNode) -> float:
+            """ノードと未配置の子孫を配置し、ノードの垂直方向の中心座標を返す。"""
+
             nonlocal nextLeafY
             if node in positions:
                 box = positions[node]
@@ -210,6 +255,12 @@ class LayoutCalculator:
         return positions, depths
 
     def _depthsFor(self, nodes: list[BaseNode]) -> dict[BaseNode, int]:
+        """トポロジカルな探索で各ノードの深さを求める。
+
+        循環に含まれて通常の探索で処理できないノードには、判明済みの親の深さを
+        基準として深さを割り当てる。
+        """
+
         allNodes = self._allNodes(nodes)
         edges = GraphTraversal().allEdges(nodes)
         incomingCount = {node: 0 for node in allNodes}

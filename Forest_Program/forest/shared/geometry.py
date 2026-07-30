@@ -1,4 +1,4 @@
-"""Value objects for coordinates, bounds, and layout animation steps."""
+"""座標、境界矩形、配置アニメーションの各段階を表す値オブジェクト。"""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, slots=True)
 class Point:
-    """A coordinate on the canvas."""
+    """キャンバス上の座標を表す。"""
 
     x: float
     y: float
@@ -20,7 +20,10 @@ class Point:
 
 @dataclass(frozen=True, slots=True)
 class BBox:
-    """A rectangular area containing only position and size."""
+    """位置と大きさだけを持つ矩形領域を表す。
+
+    幅と高さは0以上でなければならない。座標には負の値も指定できる。
+    """
 
     x: float
     y: float
@@ -34,7 +37,10 @@ class BBox:
 
 @dataclass(frozen=True, slots=True)
 class LayoutStep:
-    """Node positions for one layout animation step."""
+    """配置アニメーションの1段階におけるノード位置を表す。
+
+    ``positions`` は生成後に変更されない読み取り専用のマッピングとして保持する。
+    """
 
     index: int
     positions: Mapping[BaseNode, BBox]

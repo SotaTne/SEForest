@@ -1,10 +1,10 @@
-"""Defaults shared by layout and rendering logic."""
+"""配置計算と画像描画で共有する既定値を定義する。"""
 
 from PIL import ImageFont
 
 
 class Constants:
-    """Constants defined by the requirements and detailed design."""
+    """要求仕様書および詳細設計書に基づく定数をまとめたクラス。"""
 
     FONT_FAMILY = "Serif"
     FONT_SIZE = 12
@@ -35,7 +35,11 @@ class Constants:
 
     @staticmethod
     def loadSerifFont() -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
-        """Load the required Serif font at the configured point size."""
+        """設定されたサイズのSerifフォントを読み込む。
+
+        OSごとの候補を上から順番に試し、利用できるフォントがない場合は
+        Pillowの既定フォントを返す。
+        """
 
         for fontCandidate in Constants.SERIF_FONT_CANDIDATES:
             try:
