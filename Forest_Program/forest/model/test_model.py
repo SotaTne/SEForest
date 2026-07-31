@@ -220,6 +220,26 @@ def testPlayingFromLastStepRestartsExistingLayoutWithoutParsingAgain() -> None:
     assert parser.sources == ["source"]
 
 
+def testPlayingSingleStepTreeRebuildsAnimationSteps() -> None:
+    root = Root("Root")
+    initialStep = LayoutStep(0, {root: BBox(1.0, 2.0, 30.0, 20.0)})
+    rebuiltSteps = [
+        LayoutStep(0, {root: BBox(3.0, 4.0, 30.0, 20.0)}),
+        LayoutStep(1, {root: BBox(5.0, 6.0, 30.0, 20.0)}),
+    ]
+    layout = LayoutCalculatorFake(initialSteps=[initialStep])
+    model = Model(parser=ParserFake([root]), layoutCalculator=layout)
+    model.loadText("source")
+    layout.initialSteps = rebuiltSteps
+
+    model.setPlaying(True)
+
+    assert model.isPlaying is True
+    assert model.totalSteps == 2
+    assert model.currentStep == 0
+    assert root.bbox == rebuiltSteps[0].positions[root]
+
+
 def testPlayingFromMiddleKeepsCurrentStep() -> None:
     root = Root("root")
     steps = [

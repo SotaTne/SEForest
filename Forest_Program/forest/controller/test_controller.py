@@ -96,6 +96,15 @@ def testDropFiltersInvalidEntries(controllerAndCommands: tuple[Controller, Comma
     assert commands.calls == [("loadFile", (valid,))]
 
 
+def testDropRejectsNonListInput(controllerAndCommands: tuple[Controller, CommandRecorder]) -> None:
+    controller, commands = controllerAndCommands
+
+    with pytest.raises(TypeError, match="paths must be a list"):
+        controller.handleDrop((Path("forest.txt"),))  # ty: ignore[invalid-argument-type]
+
+    assert commands.calls == []
+
+
 def testPointerMovementBelowThresholdDoesNotPan(
     controllerAndCommands: tuple[Controller, CommandRecorder],
 ) -> None:
@@ -118,6 +127,16 @@ def testPointerMovementAtThresholdStartsDrag(
         ("panDesktop", (Constants.DRAG_THRESHOLD, 0.0)),
     ]
     assert not controller.handlePointerRelease(Point(10.0 + Constants.DRAG_THRESHOLD, 20.0))
+
+
+def testReleaseAtThresholdWithoutMoveIsNotClick(
+    controllerAndCommands: tuple[Controller, CommandRecorder],
+) -> None:
+    controller, commands = controllerAndCommands
+    controller.handlePointerPress(Point(0.0, 0.0))
+
+    assert not controller.handlePointerRelease(Point(Constants.DRAG_THRESHOLD, 0.0))
+    assert commands.calls == []
 
 
 def testDraggingForwardsIncrementalMovement(
