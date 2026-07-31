@@ -52,9 +52,4 @@ jobs:
 
       - name: Test
         run: |
-          uv run pytest || exit_code=$?
-          if [ "${exit_code:-0}" -eq 5 ]; then
-            echo "No tests were collected."
-            exit 0
-          fi
-          exit "${exit_code:-0}"
+          uv run pytest
