@@ -1,0 +1,44 @@
+%% 2026年7月31日時点のGitコミット履歴を基に作成した開発実績。
+%% 作業日は関連コミットの作成日を基準としている。
+%%{init: {"theme": "base", "themeVariables": {"background": "#ffffff", "titleColor": "#111827", "primaryColor": "#43a047", "primaryBorderColor": "#2e7d32", "primaryTextColor": "#ffffff", "taskBkgColor": "#66bb6a", "taskBorderColor": "#388e3c", "taskTextColor": "#ffffff", "taskTextOutsideColor": "#374151", "doneTaskBkgColor": "#43a047", "doneTaskBorderColor": "#2e7d32", "activeTaskBkgColor": "#81c784", "activeTaskBorderColor": "#43a047", "critBkgColor": "#2e7d32", "critBorderColor": "#1b5e20", "sectionBkgColor": "#f3f4f6", "altSectionBkgColor": "#ffffff", "gridColor": "#d1d5db", "todayLineColor": "#43a047"}, "themeCSS": ".titleText { fill: #111827 !important; } .milestone { fill: #43a047 !important; stroke: #2e7d32 !important; }"} }%%
+gantt
+    title SEForest 開発実績（2026年6月24日〜7月31日）
+    dateFormat YYYY-MM-DD
+    axisFormat %m/%d
+    tickInterval 1week
+    todayMarker off
+
+    section 開発基盤
+    リポジトリ・文書基盤整備               :done, foundation, 2026-06-24, 1d
+    CI・開発環境整備                       :done, initial_ci, 2026-06-24, 1d
+
+    section 計画
+    開発計画書作成                         :done, development_plan, 2026-06-26, 1d
+    開発計画のmain反映                     :milestone, plan_merged, 2026-06-26, 0d
+
+    section 設計
+    基本設計・UML基盤整備                  :done, basic_design, 2026-07-17, 2d
+    基本設計UI仕様追加                     :done, basic_design_ui, 2026-07-22, 1d
+    詳細設計クラス図作成                   :done, detail_design, 2026-07-28, 1d
+    詳細設計のmain反映                     :milestone, detail_merged, 2026-07-30, 0d
+    MVC設計・UML更新                       :done, mvc_design, 2026-07-31, 1d
+
+    section ロジック実装
+    解析・木構造・グラフ探索               :done, domain_logic, 2026-07-30, 1d
+    樹状配置・アニメーション段階生成       :done, layout_logic, 2026-07-30, 1d
+    PNG画像出力                            :done, image_output, 2026-07-30, 1d
+    コメント日本語化・説明補足             :done, japanese_docs, 2026-07-30, 1d
+    ロジック実装のmain反映                 :milestone, logic_merged, 2026-07-31, 0d
+
+    section MVC・GUI実装
+    Model・イベント通知                    :done, model, 2026-07-31, 1d
+    Controller・コマンドポート             :done, controller, 2026-07-31, 1d
+    PySide6 View・Canvas操作                :done, view, 2026-07-31, 1d
+    ForestApp・main起動処理                 :done, application, 2026-07-31, 1d
+    フォント・ライセンス・ビルド整備       :done, packaging, 2026-07-31, 1d
+
+    section テスト・統合
+    ロジック単体テスト・仕様書反映         :done, logic_test, 2026-07-30, 1d
+    MVC単体・結合テスト                    :done, mvc_test, 2026-07-31, 1d
+    CI・PyInstaller検証                    :done, final_ci, 2026-07-31, 1d
+    MVCアプリケーションのmain反映          :milestone, mvc_merged, 2026-07-31, 0d
