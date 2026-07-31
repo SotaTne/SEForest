@@ -10,6 +10,28 @@
     <meta name="author" content="AOKI Atsushi" />
     <link rel="stylesheet" href="../assets/css/docs.css" />
     <title>ソフトウェア工学II「樹状整列」マニュアル</title>
+    <style>
+      .manual-figure {
+        margin: 1.5rem auto 2rem;
+        text-align: center;
+      }
+
+      .manual-figure img {
+        display: block;
+        width: min(100%, 1100px);
+        height: auto;
+        margin: 0 auto 0.75rem;
+        border: 1px solid #d8d8d8;
+      }
+
+      .manual-figure figcaption {
+        color: #555;
+      }
+
+      .location-table code {
+        white-space: nowrap;
+      }
+    </style>
   </head>
   <body>
     <div id="menu">
@@ -28,12 +50,259 @@
     </div>
     <hr />
     <h2>ソフトウェア工学II「樹状整列」マニュアル</h2>
+
     <div class="belt">
-      <h3><a id="KanseiSaseteKudasai">完成させてください</a></h3>
+      <h3><a id="environment">前提環境</a></h3>
     </div>
+    <p>
+      樹状整列は、Forest形式のテキストファイルを読み込み、複数の木構造を段階的に整列して表示する
+      Pythonデスクトップアプリケーションである。実行には
+      <a href="https://mise.jdx.dev/">mise</a>を使用する。
+    </p>
+    <p>最初に、miseが利用できることを確認する。</p>
+    <pre><code>mise --version</code></pre>
+
+    <div class="belt">
+      <h3><a id="working-directory">実行するディレクトリ</a></h3>
+    </div>
+    <p>
+      アプリケーションの操作コマンドは、リポジトリ直下の<code>SEForest</code>と、
+      Python実装を置く<code>SEForest/Forest_Program</code>のどちらからでも実行できる。
+      以下のいずれかへ移動してから、同じ<code>mise</code>コマンドを使用する。
+    </p>
+    <table
+      class="bordered-table location-table"
+      aria-label="コマンドを実行できるディレクトリ"
+    >
+      <tbody>
+        <tr>
+          <th>場所</th>
+          <th>移動例</th>
+          <th>補足</th>
+        </tr>
+        <tr>
+          <td>リポジトリ直下</td>
+          <td><code>cd SEForest</code></td>
+          <td>Pythonアプリと文書の統合タスクを使用できる。</td>
+        </tr>
+        <tr>
+          <td>Python実装内</td>
+          <td><code>cd SEForest/Forest_Program</code></td>
+          <td>Pythonアプリのタスクを直接使用できる。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="belt">
+      <h3><a id="setup">インストール（初回セットアップ）</a></h3>
+    </div>
+    <p>
+      使用するディレクトリで、Pythonとuvを準備し、依存関係をインストールする。
+    </p>
+    <pre><code>mise install
+mise setup</code></pre>
+    <p>
+      リポジトリ直下で<code>mise setup</code
+      >を実行した場合は、Pythonアプリに加えて文書表示に必要な
+      Bunパッケージも準備される。<code>Forest_Program</code>内ではPythonアプリの依存関係だけが準備される。
+    </p>
+
+    <div class="belt">
+      <h3><a id="launch">起動・ビルド・終了</a></h3>
+    </div>
+    <p>開発中のアプリケーションを起動する。</p>
+    <pre><code>mise dev</code></pre>
+    <p>macOS用アプリケーションを作成する場合は、次のコマンドを実行する。</p>
+    <pre><code>mise build</code></pre>
+    <p>ビルド済みのmacOSアプリケーションを開く。</p>
+    <pre><code>mise preview</code></pre>
+    <p>アプリケーションを終了するには、ウィンドウ左上の閉じるボタンを押す。</p>
+
+    <div class="belt">
+      <h3><a id="open-file">1. Forestファイルを開く</a></h3>
+    </div>
+    <p>
+      起動直後は、キャンバス中央にファイル選択の案内が表示される。Forest形式のテキストファイルを
+      ウィンドウへドロップするか、キャンバスをクリックしてファイル選択画面を開く。
+    </p>
+    <figure class="manual-figure">
+      <img src="./01-start.png" alt="起動直後のファイル選択案内" />
+      <figcaption>図1　起動直後の画面</figcaption>
+    </figure>
+    <p>
+      ファイル選択画面では、読み込む<code>.txt</code>ファイルを選択して「開く」を押す。
+    </p>
+    <figure class="manual-figure">
+      <img src="./02-file-select.png" alt="Forestテキストファイルの選択画面" />
+      <figcaption>図2　Forestファイルの選択</figcaption>
+    </figure>
+
+    <div class="belt">
+      <h3><a id="playback">2. 配置工程を再生する</a></h3>
+    </div>
+    <p>
+      ファイルを読み込むと、解析されたノードが初期位置へ表示される。画面下中央の再生ボタンと工程表示、
+      右下の工程表示から、現在位置と総工程数を確認できる。
+    </p>
+    <figure class="manual-figure">
+      <img
+        src="./03-initial-layout.png"
+        alt="解析後のノードが初期位置に並んだ画面"
+      />
+      <figcaption>図3　初期配置</figcaption>
+    </figure>
+    <p>
+      「▶」を押すと、ノードが最終位置へ移動する工程を順番に再生する。再生中の「Ⅱ」を押すと一時停止できる。
+    </p>
+    <figure class="manual-figure">
+      <img src="./04-playing.png" alt="配置工程を再生している途中の画面" />
+      <figcaption>図4　配置工程の再生中</figcaption>
+    </figure>
+    <figure class="manual-figure">
+      <img src="./05-paused.png" alt="配置工程を一時停止した画面" />
+      <figcaption>図5　配置工程の一時停止</figcaption>
+    </figure>
+    <p>
+      最終工程まで進むと、木構造の整列が完了する。完了後に再び「▶」を押すと、現在のノード名を保持したまま
+      初期工程から再生できる。
+    </p>
+    <figure class="manual-figure">
+      <img src="./06-completed.png" alt="すべてのノードの整列が完了した画面" />
+      <figcaption>図6　整列完了</figcaption>
+    </figure>
+
+    <div class="belt">
+      <h3><a id="viewport">3. キャンバスを移動・拡大縮小する</a></h3>
+    </div>
+    <ul>
+      <li>
+        トラックパッドまたはマウスホイールで、キャンバスを縦横に移動する。
+      </li>
+      <li>キャンバスをドラッグして表示位置を移動する。</li>
+      <li>
+        Ctrl+ホイール、またはトラックパッドのピンチ操作で、ポインター位置を中心に拡大縮小する。
+      </li>
+      <li>
+        ノードは画面外へ完全に移動せず、キャンバス端には操作用の余白が残る。
+      </li>
+    </ul>
+    <figure class="manual-figure">
+      <img src="./07-zoom.png" alt="木構造を拡大して表示した画面" />
+      <figcaption>図7　ズーム表示</figcaption>
+    </figure>
+
+    <div class="belt">
+      <h3><a id="edit-node">4. ノード名を変更する</a></h3>
+    </div>
+    <p>
+      ノードをクリックすると、そのノードが選択色になり、編集ポップアップが開く。入力欄へ新しい名前を入力し、
+      ReturnまたはEnterを押すと変更を確定する。「×」またはEscapeを押すと変更を取り消す。
+    </p>
+    <figure class="manual-figure">
+      <img
+        src="./08-node-editor.png"
+        alt="ノードを選択して名称を編集中の画面"
+      />
+      <figcaption>図8　ノード名の編集</figcaption>
+    </figure>
+    <p>
+      名称を確定すると、文字列の大きさに合わせてノードと木構造が再配置される。
+    </p>
+    <figure class="manual-figure">
+      <img
+        src="./09-node-renamed.png"
+        alt="ノード名の変更を反映して再配置された画面"
+      />
+      <figcaption>図9　名称変更後の再配置</figcaption>
+    </figure>
+
+    <div class="belt">
+      <h3><a id="export-subgraph">5. 選択ノード以下を画像へ書き出す</a></h3>
+    </div>
+    <p>
+      ノード編集ポップアップの「画像に書き出す
+      このノード以下」を押すと、選択したノードを起点とする
+      部分グラフをPNG画像として保存できる。保存先とファイル名を指定して「保存」を押す。
+    </p>
+    <figure class="manual-figure">
+      <img
+        src="./10-export-subgraph.png"
+        alt="選択ノード以下のPNG画像の保存先を指定する画面"
+      />
+      <figcaption>図10　選択ノード以下の画像保存</figcaption>
+    </figure>
+
+    <div class="belt">
+      <h3><a id="canvas-menu">6. キャンバスメニューを使用する</a></h3>
+    </div>
+    <p>
+      ノード以外の場所を右クリック、またはCtrlを押しながら左クリックすると、キャンバスメニューが開く。
+      通常の左クリックではメニューは開かない。
+    </p>
+    <figure class="manual-figure">
+      <img
+        src="./11-canvas-menu.png"
+        alt="ツリー全体の保存と削除を行うキャンバスメニュー"
+      />
+      <figcaption>図11　キャンバスメニュー</figcaption>
+    </figure>
+    <ul>
+      <li>
+        「画像に書き出す ツリー全体」：表示中の全ツリーをPNG画像として保存する。
+      </li>
+      <li>
+        「ツリーを削除
+        ファイル選択に戻る」：読み込んだツリーを消去し、起動直後の画面へ戻る。
+      </li>
+    </ul>
+    <figure class="manual-figure">
+      <img
+        src="./12-export-canvas.png"
+        alt="ツリー全体のPNG画像の保存先を指定する画面"
+      />
+      <figcaption>図12　ツリー全体の画像保存</figcaption>
+    </figure>
+
+    <div class="belt">
+      <h3><a id="troubleshooting">困ったとき</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="問題と対処方法">
+      <tbody>
+        <tr>
+          <th>状態</th>
+          <th>対処</th>
+        </tr>
+        <tr>
+          <td><code>mise</code>が見つからない</td>
+          <td>
+            miseをインストールし、新しいターミナルで<code>mise --version</code
+            >を確認する。
+          </td>
+        </tr>
+        <tr>
+          <td>依存ライブラリを読み込めない</td>
+          <td>
+            実行中のディレクトリで<code>mise install</code>と<code
+              >mise setup</code
+            >を再実行する。
+          </td>
+        </tr>
+        <tr>
+          <td>ツリーが表示されない</td>
+          <td>
+            Forest形式の<code>.txt</code>ファイルを選択しているか確認する。
+          </td>
+        </tr>
+        <tr>
+          <td>拡大縮小できない</td>
+          <td>Ctrl+ホイール、またはトラックパッドのピンチ操作を使用する。</td>
+        </tr>
+      </tbody>
+    </table>
+
     <hr />
     <div class="right-small">
-      Copyright 20xx Project xx, Updated: 2026/07/22 (Created: 2009/11/11)
+      Copyright 2026 Project SEForest, Updated: 2026/07/31 (Created: 2009/11/11)
     </div>
   </body>
 </html>
