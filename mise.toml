@@ -54,6 +54,15 @@ description = "ビルドしたアプリをプレビューします"
 dir = "Forest_Program"
 run = "mise run preview"
 
+# プログラム文書の生成
+[tasks."program:generate"]
+description = "Pythonソースのプログラム文書を生成・整形・検証します"
+run = [
+  "bun run generate:program -- --source Forest_Program --output Forest_Document/Program/index.html",
+  "bun run format:html -- Forest_Document/Program/index.html",
+  "bun run check:html -- Forest_Document/Program/index.html",
+]
+
 # htmlのチェック
 [tasks."check:html"]
 description = "HTMLのコードのチェックを行います"
