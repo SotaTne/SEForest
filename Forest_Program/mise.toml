@@ -29,3 +29,7 @@ run = "uv run pytest"
 [tasks.build]
 description = "ビルドを行います"
 run = "uv run pyinstaller main.spec --noconfirm --workpath .pyinstaller-build"
+
+[tasks.preview]
+description = "ビルドしたアプリをプレビューします"
+run = "open dist/Forest.app"

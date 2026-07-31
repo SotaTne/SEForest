@@ -49,6 +49,11 @@ description = "ビルドを行います"
 dir = "Forest_Program"
 run = "mise run build"
 
+[tasks.preview]
+description = "ビルドしたアプリをプレビューします"
+dir = "Forest_Program"
+run = "mise run preview"
+
 # htmlのチェック
 [tasks."check:html"]
 description = "HTMLのコードのチェックを行います"
