@@ -1,0 +1,100 @@
+---
+config:
+  layout: elk
+  class:
+    defaultRenderer: elk
+    nodeSpacing: 55
+    rankSpacing: 80
+---
+classDiagram
+direction TB
+%% display-width: 48%
+%% display-height: 520px
+
+class Point {
+  <<value object>>
+  +x: float
+  +y: float
+}
+
+class BBox {
+  <<value object>>
+  +x: float
+  +y: float
+  +width: float
+  +height: float
+}
+
+class LayoutStep {
+  <<value object>>
+  +index: int
+  +positions: dict~BaseNode, BBox~
+}
+
+class Constants {
+  <<utility>>
+  +FONT_FAMILY: str = Serif
+  +FONT_SIZE: int = 12
+  +HORIZONTAL_SPACING: float = 25
+  +VERTICAL_SPACING: float = 2
+  +MIN_ZOOM_SCALE: float
+  +MAX_ZOOM_SCALE: float
+  +DRAG_THRESHOLD: float
+  +PLAYBACK_INTERVAL_MS: int
+  +loadSerifFont() object
+}
+
+class BaseNode {
+  <<abstract>>
+  -text: str
+  -bbox: BBox
+  +rename(text: str) None
+  +children() tuple~BaseNode~
+}
+
+class Node {
+  -childNodes: list~BaseNode~
+  +addChild(child: BaseNode) None
+  +children() tuple~BaseNode~
+}
+
+class Root {
+  -childNodes: list~BaseNode~
+  +addChild(child: BaseNode) None
+  +children() tuple~BaseNode~
+}
+
+class Leaf {
+  +children() tuple~BaseNode~
+}
+
+class Desktop {
+  -windowSizeBBox: BBox
+  -windowCanvasBBox: BBox
+  -zoomScale: float
+  +resize(width: float, height: float) None
+  +pan(dx: float, dy: float) None
+  +zoomAt(anchor: Point, scaleDelta: float) None
+  +canvasToView(point: Point) Point
+  +viewToCanvas(point: Point) Point
+  +resetViewport() None
+}
+
+BaseNode <|-- Node
+BaseNode <|-- Root
+BaseNode <|-- Leaf
+BaseNode *-- BBox : bbox
+Desktop *-- BBox : viewport
+LayoutStep o-- "0..*" BaseNode : positions
+LayoutStep o-- "0..*" BBox : positions
+
+note for BaseNode "全ノードに共通する表示情報と操作"
+note for Node "子を持つ中間ノード"
+note for Root "各木構造の表示開始点"
+note for Leaf "子を持たない末端ノード"
+note for Desktop "表示範囲、スクロール位置、拡大率を管理"
+
+classDef core fill:#fff8e8,stroke:#8a7446,color:#3f3522,stroke-width:1.5px
+classDef support fill:#f3f4f6,stroke:#6b7280,color:#27303f,stroke-width:1.5px
+cssClass "BaseNode,Node,Root,Leaf" core
+cssClass "Point,BBox,LayoutStep,Constants,Desktop" support

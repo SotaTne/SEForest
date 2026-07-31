@@ -6,7 +6,6 @@ from forest.layout import GraphTraversal
 from forest.parser import ParseError, Parser
 from forest.tree import BaseNode, Leaf, Root
 
-
 REQUIREMENT_TEXTS = Path(__file__).parents[3] / "Forest_Document" / "Requirement" / "texts"
 
 

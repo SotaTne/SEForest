@@ -1,3 +1,5 @@
+import sys
+from pathlib import Path
 from types import MappingProxyType
 
 import pytest
@@ -31,7 +33,7 @@ def testLayoutStepRejectsNegativeIndex() -> None:
 
 
 def testConstantsMatchRequirements() -> None:
-    assert Constants.FONT_FAMILY == "Serif"
+    assert Constants.FONT_FAMILY == "Noto Serif JP"
     assert Constants.FONT_SIZE == 12
     assert Constants.HORIZONTAL_SPACING == 25.0
     assert Constants.VERTICAL_SPACING == 2.0
@@ -42,7 +44,20 @@ def testConstantsCannotBeInstantiated() -> None:
         Constants()
 
 
+def testApplicationRootUsesProjectRootDuringNormalExecution() -> None:
+    assert Constants.applicationRoot() == Path(__file__).parents[2]
+
+
+def testApplicationRootUsesPyInstallerBundleRoot(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(sys, "_MEIPASS", str(tmp_path), raising=False)
+
+    assert Constants.applicationRoot() == tmp_path
+
+
 def testLoadSerifFontUsesRequiredPointSize() -> None:
     font = Constants.loadSerifFont()
     assert font.getbbox("Forest")[2] > 0
+    assert font.getbbox("日本語")[2] > 0
+    assert getattr(font, "path", None) == Path(__file__).parents[2] / Constants.FONT_PATH
+    assert font.getname()[0] == "Noto Serif JP"
     assert getattr(font, "size", Constants.FONT_SIZE) == Constants.FONT_SIZE

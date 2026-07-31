@@ -64,7 +64,7 @@
         font-weight: bold;
       }
     </style>
-    <title>ソフトウェア工学II「樹状整列」基本設計書（2026年7月22日時点）</title>
+    <title>ソフトウェア工学II「樹状整列」基本設計書（2026年7月31日時点）</title>
   </head>
   <body>
     <div id="menu">
@@ -84,7 +84,7 @@
       </ul>
     </div>
     <hr />
-    <h2>ソフトウェア工学II「樹状整列」基本設計書（2026年7月22日時点）</h2>
+    <h2>ソフトウェア工学II「樹状整列」基本設計書（2026年7月31日時点）</h2>
     <div class="belt">
       <h3><a id="SekkeiGaiyou">設計概要</a></h3>
     </div>
@@ -109,7 +109,9 @@
       </li>
       <li>
         Modelは現在の整列工程、全工程数、再生中かどうかを保持する。
-        再生処理は整列計算を一工程ずつ進め、各工程でノードのBBoxを更新してViewへ通知する。
+        再生処理は整列計算を一工程ずつ進め、各工程でノードのBBoxを更新する。
+        Modelは変更された状態領域をModelEventとして通知し、
+        Viewは登録したcallbackで通知を受けてModelから最新の表示値を読み直す。
       </li>
       <li>
         編集中の文字列はウィンドウが保持し、更新操作でノードへ反映する。
@@ -121,8 +123,8 @@
     </div>
     <p>
       図のMermaidソースは
-      <a href="basic-design-2026-07-22.mmd"
-        ><code>basic-design-2026-07-22.mmd</code></a
+      <a href="basic-design-2026-07-31.mmd"
+        ><code>basic-design-2026-07-31.mmd</code></a
       >から読み込む。
     </p>
     <p>
@@ -131,13 +133,28 @@
       実現を藍、依存を紫で示す。
     </p>
     <p>
-      基本設計では構造上の保持関係とMVC・Observerの関係を示し、
+      基本設計では構造上の保持関係とMVC・Observerの関係を示す。
+      EventEmitterはイベント別にViewのcallbackを登録し、Modelからの通知時に呼び出す。
+      Subscriptionやcallback自体のクラスは実装詳細として省略する。
       Modelから各処理を呼び出す実装上の依存関係は省略する。
     </p>
     <div class="mermaid-container uml-shared-aggregation">
-      <pre class="mermaid" data-mermaid-source="basic-design-2026-07-22.mmd">
+      <pre class="mermaid" data-mermaid-source="basic-design-2026-07-31.mmd">
 基本設計図を読み込んでいます。</pre>
     </div>
+    <details class="old-design" id="OldBasicDesign20260722">
+      <summary>2026年7月22日時点の基本設計図</summary>
+      <p>
+        旧版のMermaidソースは
+        <a href="basic-design-2026-07-22.mmd"
+          ><code>basic-design-2026-07-22.mmd</code></a
+        >から確認できる。
+      </p>
+      <div class="mermaid-container uml-shared-aggregation">
+        <pre class="mermaid" data-mermaid-source="basic-design-2026-07-22.mmd">
+基本設計図を読み込んでいます。</pre>
+      </div>
+    </details>
     <details class="old-design" id="OldBasicDesign20260718">
       <summary>2026年7月18日時点の基本設計図</summary>
       <p>
@@ -348,7 +365,7 @@
     </table>
     <hr />
     <div class="right-small">
-      Copyright 20xx Project xx, Updated: 2026/07/30 (Created: 2009/11/11)
+      Copyright 20xx Project xx, Updated: 2026/07/31 (Created: 2009/11/11)
     </div>
   </body>
 </html>

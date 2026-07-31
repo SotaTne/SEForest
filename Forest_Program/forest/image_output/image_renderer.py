@@ -47,8 +47,8 @@ class ImageRenderer:
     def _createTargetCanvas(self, bounds: BBox) -> Image.Image:
         """描画範囲と余白を含む出力用キャンバスを生成する。"""
 
-        width = max(1, int(round(bounds.width)) + Constants.IMAGE_PADDING * 2)
-        height = max(1, int(round(bounds.height)) + Constants.IMAGE_PADDING * 2)
+        width = max(1, round(bounds.width) + Constants.IMAGE_PADDING * 2)
+        height = max(1, round(bounds.height) + Constants.IMAGE_PADDING * 2)
         self._targetCanvas = Image.new("RGB", (width, height), Constants.IMAGE_BACKGROUND_COLOR)
         return self._targetCanvas
 

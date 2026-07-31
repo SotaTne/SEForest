@@ -1,0 +1,213 @@
+---
+config:
+  layout: elk
+  elk:
+    mergeEdges: false
+    nodePlacementStrategy: BRANDES_KOEPF
+    considerModelOrder: PREFER_EDGES
+  class:
+    defaultRenderer: elk
+    nodeSpacing: 50
+    rankSpacing: 70
+---
+classDiagram
+direction TB
+
+class BBox {
+  -x: float
+  -y: float
+  -width: float
+  -height: float
+}
+note for BBox "位置と大きさを表す矩形領域"
+
+class BaseNode {
+  -text: str
+  -bbox: BBox
+}
+note for BaseNode "全ノードに共通する表示情報"
+
+class Node {
+  -children: list~BaseNode~
+}
+note for Node "子ノードを共有可能な形で保持"
+
+class Root {
+  -children: list~BaseNode~
+}
+note for Root "表示開始点として明示されるノード"
+
+class Leaf
+note for Leaf "子を持たない末端ノード"
+
+BaseNode <|-- Node
+BaseNode <|-- Root
+BaseNode <|-- Leaf
+BaseNode *-- BBox : bbox
+
+class Desktop {
+  -windowSizeBBox: BBox
+  -windowCanvasBBox: BBox
+  -zoomScale: float
+}
+note for Desktop "メイン画面の表示範囲と拡大率を保持"
+
+Desktop *-- BBox : windowSizeBBox
+Desktop *-- BBox : windowCanvasBBox
+
+class NodeEditorState {
+  -selectedNode: BaseNode
+  -editingText: str
+  -popupBBox: BBox
+}
+note for NodeEditorState "選択ノードの編集状態を管理"
+
+class Model {
+  +events: EventEmitter~ModelEvent~
+  -sourceText: str
+  -nodes: list~BaseNode~
+  -canvasBBox: BBox
+  -outputFile: Path | None
+  -desktop: Desktop
+  -nodeEditorState: NodeEditorState | None
+  -currentStep: int
+  -totalSteps: int
+  -isPlaying: bool
+}
+note for Model "アプリケーション全体の状態を保持"
+
+Model o-- "0..*" BaseNode : nodes
+Model *-- Desktop : desktop
+Model *-- "0..1" NodeEditorState : nodeEditorState
+Model *-- BBox : canvasBBox
+
+class EventEmitter~E~
+note for EventEmitter "Observerパターンによるイベント別の変更通知を管理"
+
+class ModelEvent {
+  <<enumeration>>
+  NODES_CHANGED
+  LAYOUT_CHANGED
+  SELECTION_CHANGED
+  EDITOR_CHANGED
+  PLAYBACK_CHANGED
+  DESKTOP_CHANGED
+}
+note for ModelEvent "Viewが再読込するModelの状態領域を表す"
+
+Model *-- EventEmitter : events
+EventEmitter ..> ModelEvent : event type
+
+class Constants {
+  <<utility>>
+  +horizontalSpacing: float
+  +verticalSpacing: float
+  +canvasViewportMargin: float
+  +playbackStepIntervalMs: int
+  +selectedNodeColors: colors by node type
+}
+note for Constants "整列間隔、1step 50msの再生間隔、Canvas移動余白、Root・Node・Leaf別の選択色を共有"
+
+class Parser
+note for Parser "元テキストをノード一覧へ変換"
+
+Parser ..> BaseNode : creates
+
+class LayoutCalculator {
+  -measuredSizeCache: dict~BaseNode, BBox~
+  -parentsByNode: dict~BaseNode, list[BaseNode]~
+  -layoutVersion: int
+}
+note for LayoutCalculator "ノードの配置とbboxを計算"
+
+LayoutCalculator ..> BaseNode : calculates bbox
+LayoutCalculator ..> Desktop : initial bounds
+LayoutCalculator ..> Constants : reads spacing
+
+class BBoxCalculator
+note for BBoxCalculator "選択範囲のbboxを算出"
+
+BBoxCalculator ..> BaseNode : reads bbox
+BBoxCalculator ..> BBox : creates
+
+class GraphTraversal
+note for GraphTraversal "共有ノードを考慮して到達可能なノードを探索"
+
+GraphTraversal ..> BaseNode : traverses
+
+class ImageRenderer
+note for ImageRenderer "選択ノードから到達可能な範囲を画像化"
+
+ImageRenderer ..> BaseNode : selected node
+ImageRenderer ..> GraphTraversal : collects reachable nodes
+ImageRenderer ..> BBoxCalculator : image bounds
+
+class DesktopView {
+  -model: Model
+  -scene: QGraphicsScene
+  -canvas: DesktopGraphicsView
+  -nodeEditorPopupView: NodeEditorPopupView
+  -canvasPopupView: CanvasPopupView
+}
+note for DesktopView "PySide6のメイン画面とGraphics Sceneを表示"
+
+class DesktopGraphicsView
+note for DesktopGraphicsView "ホイール、ピンチ、DnD、ポインター入力を受け取る"
+
+class CanvasRenderer
+note for CanvasRenderer "Modelの状態をQGraphicsItemへ差分反映"
+
+class NodeGraphicsItem
+note for NodeGraphicsItem "ノードの背景、枠線、文字列を一体表示"
+
+class NodeEditorPopupView
+note for NodeEditorPopupView "選択ノードの編集画面を表示"
+
+class CanvasPopupView
+note for CanvasPopupView "Control+左クリックまたは右クリックで開き、Canvas全体の画像出力とツリー削除を表示"
+
+class ControllerInputPort {
+  <<interface>>
+  +clearTree() None
+}
+note for ControllerInputPort "ViewからControllerへ送る入力メッセージの受信口"
+
+class ModelCommandPort {
+  <<interface>>
+  +clearTree() None
+}
+note for ModelCommandPort "ControllerからModelへ送る更新メッセージの受信口"
+
+class Controller
+note for Controller "入力を薄く正規化し、Model用メッセージへ変換"
+
+class ForestApp {
+  -application: QApplication
+  -model: Model
+  -desktopView: DesktopView
+  -controller: Controller
+  +build() None
+  +run() None
+}
+note for ForestApp "MVC各要素を構成して起動"
+
+DesktopView --> EventEmitter : subscribes
+DesktopView ..> Model : renders
+DesktopView *-- NodeEditorPopupView : nodeEditorPopupView
+DesktopView *-- CanvasPopupView : canvasPopupView
+DesktopView *-- DesktopGraphicsView : canvas
+DesktopView *-- CanvasRenderer : renderer
+DesktopGraphicsView --> ControllerInputPort : sends input
+CanvasRenderer *-- NodeGraphicsItem : node items
+DesktopView --> ControllerInputPort : sends input
+Controller ..|> ControllerInputPort : receives input
+Controller --> ModelCommandPort : sends messages
+Model ..|> ModelCommandPort : receives messages
+ForestApp *-- Model : model
+ForestApp *-- DesktopView : desktopView
+ForestApp *-- Controller : controller
+
+classDef mvc fill:#eaf2ff,stroke:#54749f,color:#20334d,stroke-width:1.5px
+classDef core fill:#fff8e8,stroke:#8a7446,color:#3f3522,stroke-width:1.5px
+cssClass "ForestApp,Model,ModelCommandPort,ControllerInputPort,ModelEvent,EventEmitter,NodeEditorState,Desktop,DesktopView,DesktopGraphicsView,CanvasRenderer,NodeGraphicsItem,NodeEditorPopupView,CanvasPopupView,Controller" mvc
+cssClass "BBox,BaseNode,Leaf,Node,Root,Constants,Parser,LayoutCalculator,BBoxCalculator,GraphTraversal,ImageRenderer" core

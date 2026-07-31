@@ -3,18 +3,17 @@
 import sys
 from pathlib import Path
 
-from PyInstaller.utils.hooks import collect_data_files
-
-
 app_dir = Path(SPECPATH).resolve()
 
 
-def collect_directory(directory_name):
+def collect_directory(directory_name: str) -> list[tuple[str, str]]:
+    """アプリケーションへ同梱するディレクトリ内のファイルを収集する。"""
+
     source_dir = app_dir / directory_name
     if not source_dir.exists():
         return []
 
-    datas = []
+    datas: list[tuple[str, str]] = []
     for source_path in source_dir.rglob("*"):
         if source_path.is_file():
             relative_path = source_path.relative_to(source_dir)
@@ -25,8 +24,8 @@ def collect_directory(directory_name):
 
 datas = []
 datas += collect_directory("assets")
-datas += collect_data_files("customtkinter")
-datas += collect_data_files("tkinterdnd2")
+datas += collect_directory("THIRD_PARTY_LICENSES")
+datas.append((str(app_dir / "LICENSE"), "."))
 
 a = Analysis(
     [str(app_dir / "main.py")],
@@ -52,9 +51,9 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
-    console=True,
-    disable_windowed_traceback=False,
+    upx=False,
+    console=False,
+    disable_windowed_traceback=True,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
@@ -65,7 +64,7 @@ coll = COLLECT(
     a.binaries,
     a.datas,
     strip=False,
-    upx=True,
+    upx=False,
     upx_exclude=[],
     name="Forest",
 )
@@ -75,5 +74,5 @@ if sys.platform == "darwin":
         coll,
         name="Forest.app",
         icon=None,
-        bundle_identifier="com.example.forest",
+        bundle_identifier="jp.seforest.forest",
     )

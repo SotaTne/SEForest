@@ -16,9 +16,10 @@ const CONTROL_BUTTONS = [
   ["in", "＋", "UML図を拡大"],
   ["save", "保存", "UML図をSVG形式で保存"],
 ];
-const MULTIPLICITY_RELATION_PATTERN =
-  /^\s*([\w-]+)(\s+"[^"]+")?\s+(<\|--|--\*|\*--|--o|o--|-->|<--|\.\.>|<\.\.|--)\s+("[^"]+"\s+)?([\w-]+)/;
-
+const DISPLAY_WIDTH_PATTERN =
+  /^%%\s*display-width:\s*(\d+(?:\.\d+)?(?:px|rem|vh|vw|%))\s*$/m;
+const DISPLAY_HEIGHT_PATTERN =
+  /^%%\s*display-height:\s*(\d+(?:\.\d+)?(?:px|rem|vh|vw|%))\s*$/m;
 async function loadMermaid() {
   const [mermaidModule, elkModule] = await Promise.all([
     import("https://cdn.jsdelivr.net/npm/mermaid@11.16.0/dist/mermaid.esm.min.mjs"),
@@ -77,13 +78,51 @@ function addDiagramControls(element, svg) {
   const minimumScale = Number(container.dataset.umlZoomMin ?? "0.25");
   const maximumScale = Number(container.dataset.umlZoomMax ?? "2");
   const scaleStep = Number(container.dataset.umlZoomStep ?? "0.25");
-  const initialWidth = svg.getBoundingClientRect().width;
   const initialHeight = container.getBoundingClientRect().height;
+  const displayWidth = element.umlSourceText?.match(DISPLAY_WIDTH_PATTERN)?.[1];
+  const displayHeight = element.umlSourceText?.match(
+    DISPLAY_HEIGHT_PATTERN,
+  )?.[1];
   let scale = 1;
   let touchStartDistance = 0;
   let touchStartScale = 1;
   let gestureStartScale = 1;
-  container.style.height = `${initialHeight}px`;
+  const panel = container.closest(".uml-diagram-panel");
+
+  if (displayWidth && panel) {
+    panel.style.flexBasis = displayWidth;
+    panel.style.maxWidth = displayWidth;
+  }
+
+  container.style.height = displayHeight ?? `${initialHeight}px`;
+
+  const getFittedWidth = () => {
+    const containerStyle = getComputedStyle(container);
+    const horizontalPadding =
+      Number.parseFloat(containerStyle.paddingLeft) +
+      Number.parseFloat(containerStyle.paddingRight);
+    const verticalPadding =
+      Number.parseFloat(containerStyle.paddingTop) +
+      Number.parseFloat(containerStyle.paddingBottom);
+    const availableWidth = Math.max(
+      1,
+      container.clientWidth - horizontalPadding,
+    );
+    const availableHeight = Math.max(
+      1,
+      container.clientHeight - verticalPadding,
+    );
+    const viewBox = svg.viewBox.baseVal;
+
+    if (viewBox.width <= 0 || viewBox.height <= 0) {
+      return availableWidth;
+    }
+
+    return Math.min(
+      availableWidth,
+      availableHeight * (viewBox.width / viewBox.height),
+    );
+  };
 
   const applyScale = (anchor = null) => {
     const previousBounds = svg.getBoundingClientRect();
@@ -110,7 +149,7 @@ function addDiagramControls(element, svg) {
         : null;
 
     scale = Math.min(maximumScale, Math.max(minimumScale, scale));
-    svg.style.width = `${initialWidth * scale}px`;
+    svg.style.width = `${getFittedWidth() * scale}px`;
     svg.style.minWidth = "0px";
     svg.style.maxWidth = "none";
     container.style.overscrollBehavior = scale <= 1 ? "auto" : "contain";
@@ -245,6 +284,11 @@ function addDiagramControls(element, svg) {
 
   container.dataset.umlZoomReady = "true";
   applyScale();
+
+  const resizeObserver = new ResizeObserver(() => {
+    applyScale();
+  });
+  resizeObserver.observe(container);
 }
 
 function enhanceDiagram(element) {
@@ -331,59 +375,52 @@ function enhanceDiagram(element) {
     }
   }
 
-  // Mermaid does not link multiplicity labels to their relation paths.
-  // Match them with the source definition, then center and color each label.
-  const multiplicityRelations = (element.umlSourceText ?? "")
-    .split("\n")
-    .map((line) => line.match(MULTIPLICITY_RELATION_PATTERN))
-    .filter((match) => match && (match[2] || match[4]))
-    .map((match) => {
-      const [, source, sourceMultiplicity, arrow, targetMultiplicity, target] =
-        match;
-      const relationType = arrow.includes("*")
-        ? "composition"
-        : arrow.includes("o")
-          ? "aggregation"
-          : "association";
-      const relation = relations.find(
-        (path) =>
-          path.dataset.id.startsWith(`id_${source}_${target}_`) &&
-          relationTypes.get(path.dataset.id) === relationType,
-      );
-      return {
-        relation,
-        relationType,
-        terminalAtStart: Boolean(sourceMultiplicity && !targetMultiplicity),
-      };
-    });
-
+  // Mermaid does not identify which relation owns each multiplicity label.
+  // Use the nearest rendered endpoint, without moving the label group itself.
   const terminals = [...svg.querySelectorAll(".edgeTerminals")];
 
-  for (const [index, terminal] of terminals.entries()) {
-    const multiplicityRelation = multiplicityRelations[index];
+  for (const terminal of terminals) {
     const labelBox = terminal.querySelector("foreignObject > div");
+    const transform = terminal.getAttribute("transform") ?? "";
+    const coordinates = transform.match(/translate\(([^, ]+)[, ]+([^\)]+)\)/);
 
-    if (!multiplicityRelation?.relation || !labelBox) {
+    if (!labelBox || !coordinates) {
       continue;
     }
 
-    const { relation, relationType, terminalAtStart } = multiplicityRelation;
-    const relationStyle = RELATION_STYLES[relationType];
-    const endpoint = relation.getPointAtLength(
-      terminalAtStart ? 0 : relation.getTotalLength(),
-    );
-    const currentTransform = terminal.getAttribute("transform") ?? "";
-    const currentY = currentTransform.match(
-      /translate\([^, ]+[, ]+([^\)]+)\)/,
-    )?.[1];
+    const terminalPoint = {
+      x: Number(coordinates[1]),
+      y: Number(coordinates[2]),
+    };
+    let nearestRelation = null;
+    let nearestDistance = Number.POSITIVE_INFINITY;
 
-    if (currentY) {
-      terminal.setAttribute(
-        "transform",
-        `translate(${endpoint.x}, ${currentY})`,
-      );
+    for (const relation of relations) {
+      for (const endpoint of [
+        relation.getPointAtLength(0),
+        relation.getPointAtLength(relation.getTotalLength()),
+      ]) {
+        const distance = Math.hypot(
+          endpoint.x - terminalPoint.x,
+          endpoint.y - terminalPoint.y,
+        );
+
+        if (distance < nearestDistance) {
+          nearestRelation = relation;
+          nearestDistance = distance;
+        }
+      }
     }
 
+    const relationType = nearestRelation
+      ? relationTypes.get(nearestRelation.dataset.id)
+      : null;
+
+    if (!relationType) {
+      continue;
+    }
+
+    const relationStyle = RELATION_STYLES[relationType];
     const foreignObject = labelBox.closest("foreignObject");
 
     if (foreignObject?.parentElement === terminal) {
@@ -427,6 +464,7 @@ async function renderDiagrams(elements) {
     securityLevel: "strict",
     theme: "default",
   });
+
   await mermaid.run({ nodes: elements });
   elements.forEach(enhanceDiagram);
 }

@@ -1,10 +1,14 @@
 [tools]
-python = { version = "3.13.13", virtualenv = ".venv" }
+python = { version = "3.14.6", virtualenv = ".venv" }
 uv = "0.11.13"
 
 [tasks.setup]
 description = "uvのセットアップを行います"
 run = "uv sync"
+
+[tasks.dev]
+description = "アプリを開発モードで実行します"
+run = "uv run main.py"
 
 [tasks.lint]
 description = "コードのチェックを行います"
@@ -25,3 +29,7 @@ run = "uv run pytest"
 [tasks.build]
 description = "ビルドを行います"
 run = "uv run pyinstaller main.spec --noconfirm --workpath .pyinstaller-build"
+
+[tasks.preview]
+description = "ビルドしたアプリをプレビューします"
+run = "open dist/Forest.app"

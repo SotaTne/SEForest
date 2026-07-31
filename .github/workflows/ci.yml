@@ -29,7 +29,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: "3.14.6"
 
       - name: Setup uv
         uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
@@ -37,6 +37,9 @@ jobs:
           version: "0.11.13"
           enable-cache: true
           cache-dependency-glob: "Forest_Program/uv.lock"
+
+      - name: Install Qt system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libegl1
 
       - name: Install dependencies
         run: uv sync --locked
@@ -49,9 +52,4 @@ jobs:
 
       - name: Test
         run: |
-          uv run pytest || exit_code=$?
-          if [ "${exit_code:-0}" -eq 5 ]; then
-            echo "No tests were collected."
-            exit 0
-          fi
-          exit "${exit_code:-0}"
+          uv run pytest

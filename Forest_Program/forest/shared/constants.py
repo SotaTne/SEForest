@@ -1,26 +1,25 @@
 """配置計算と画像描画で共有する既定値を定義する。"""
 
+import sys
+from pathlib import Path
+from typing import Self
+
 from PIL import ImageFont
 
 
 class Constants:
     """要求仕様書および詳細設計書に基づく定数をまとめたクラス。"""
 
-    FONT_FAMILY = "Serif"
+    FONT_FAMILY = "Noto Serif JP"
     FONT_SIZE = 12
-    SERIF_FONT_CANDIDATES = (
-        "/System/Library/Fonts/Times.ttc",
-        "/System/Library/Fonts/Supplemental/Times New Roman.ttf",
-        "DejaVuSerif.ttf",
-        "LiberationSerif-Regular.ttf",
-        "C:/Windows/Fonts/times.ttf",
-    )
+    FONT_PATH = Path("assets/fonts/NotoSerifJP-Regular.otf")
     HORIZONTAL_SPACING = 25.0
     VERTICAL_SPACING = 2.0
     MIN_ZOOM_SCALE = 0.1
     MAX_ZOOM_SCALE = 8.0
     DRAG_THRESHOLD = 4.0
-    PLAYBACK_INTERVAL_MS = 100
+    CANVAS_VIEWPORT_MARGIN = 100.0
+    PLAYBACK_STEP_INTERVAL_MS = 50
     MIN_NODE_WIDTH = 24.0
     NODE_HORIZONTAL_PADDING = 12.0
     NODE_VERTICAL_PADDING = 8.0
@@ -29,24 +28,30 @@ class Constants:
     ROOT_FILL_COLOR = "#ead8bd"
     NODE_FILL_COLOR = "#f4ead3"
     LEAF_FILL_COLOR = "#e8f1cf"
+    ROOT_SELECTED_FILL_COLOR = "#f1e4d8"
+    ROOT_SELECTED_BORDER_COLOR = "#d5bfae"
+    NODE_SELECTED_FILL_COLOR = "#f0eeea"
+    NODE_SELECTED_BORDER_COLOR = "#cfc9c1"
+    LEAF_SELECTED_FILL_COLOR = "#e7f1e2"
+    LEAF_SELECTED_BORDER_COLOR = "#bfd3b7"
     EDGE_COLOR = "#5f6b7a"
     BORDER_COLOR = "#5d5348"
     TEXT_COLOR = "#202020"
 
     @staticmethod
-    def loadSerifFont() -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
-        """設定されたサイズのSerifフォントを読み込む。
+    def applicationRoot() -> Path:
+        """フォントなどの同梱ファイルを探す基準ディレクトリを返す。"""
 
-        OSごとの候補を上から順番に試し、利用できるフォントがない場合は
-        Pillowの既定フォントを返す。
-        """
+        bundledRoot = getattr(sys, "_MEIPASS", None)
+        if bundledRoot is not None:
+            return Path(bundledRoot)
+        return Path(__file__).resolve().parents[2]
 
-        for fontCandidate in Constants.SERIF_FONT_CANDIDATES:
-            try:
-                return ImageFont.truetype(fontCandidate, Constants.FONT_SIZE)
-            except OSError:
-                continue
-        return ImageFont.load_default(size=Constants.FONT_SIZE)
+    @staticmethod
+    def loadSerifFont() -> ImageFont.FreeTypeFont:
+        """同梱された日本語対応Serifフォントを読み込む。"""
 
-    def __new__(cls) -> "Constants":
+        return ImageFont.truetype(Constants.applicationRoot() / Constants.FONT_PATH, Constants.FONT_SIZE)
+
+    def __new__(cls) -> Self:
         raise TypeError("Constants cannot be instantiated")

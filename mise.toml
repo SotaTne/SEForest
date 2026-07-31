@@ -1,6 +1,6 @@
 [tools]
 bun = "1.3.14"
-python = { version = "3.13.13", virtualenv = "Forest_Program/.venv" }
+python = { version = "3.14.6", virtualenv = "Forest_Program/.venv" }
 uv = "0.11.13"
 
 # セットアップ
@@ -18,6 +18,11 @@ depends = ["lint", "typecheck", "format", "check:html", "check:mmd"]
 description = "uvのセットアップを行います"
 dir = "Forest_Program"
 run = "mise run setup"
+
+[tasks.dev]
+description = "アプリを開発モードで実行します"
+dir = "Forest_Program"
+run = "mise run dev"
 
 [tasks.lint]
 description = "コードのリントを行います"
@@ -43,6 +48,11 @@ run = "mise run test"
 description = "ビルドを行います"
 dir = "Forest_Program"
 run = "mise run build"
+
+[tasks.preview]
+description = "ビルドしたアプリをプレビューします"
+dir = "Forest_Program"
+run = "mise run preview"
 
 # htmlのチェック
 [tasks."check:html"]

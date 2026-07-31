@@ -1,0 +1,402 @@
+---
+config:
+  layout: elk
+  elk:
+    mergeEdges: false
+    nodePlacementStrategy: BRANDES_KOEPF
+    considerModelOrder: PREFER_EDGES
+  class:
+    defaultRenderer: elk
+    nodeSpacing: 55
+    rankSpacing: 80
+---
+classDiagram
+direction TB
+
+namespace Shared {
+  class Point {
+    <<value object>>
+    +x: float
+    +y: float
+  }
+  class BBox {
+    <<value object>>
+    +x: float
+    +y: float
+    +width: float
+    +height: float
+  }
+  class LayoutStep {
+    <<value object>>
+    +index: int
+    +positions: dict~BaseNode, BBox~
+  }
+  class Constants {
+    <<utility>>
+    +FONT_FAMILY: str = Serif
+    +FONT_SIZE: int = 12
+    +HORIZONTAL_SPACING: float = 25
+    +VERTICAL_SPACING: float = 2
+    +MIN_ZOOM_SCALE: float
+    +MAX_ZOOM_SCALE: float
+    +DRAG_THRESHOLD: float
+    +CANVAS_VIEWPORT_MARGIN: float = 100
+    +PLAYBACK_STEP_INTERVAL_MS: int = 50
+    +ROOT_SELECTED_FILL_COLOR: str
+    +ROOT_SELECTED_BORDER_COLOR: str
+    +NODE_SELECTED_FILL_COLOR: str
+    +NODE_SELECTED_BORDER_COLOR: str
+    +LEAF_SELECTED_FILL_COLOR: str
+    +LEAF_SELECTED_BORDER_COLOR: str
+    +loadSerifFont() object
+  }
+}
+
+namespace Tree {
+  class BaseNode {
+    <<abstract>>
+    -text: str
+    -bbox: BBox
+    +rename(text: str) None
+    +children() tuple~BaseNode~
+  }
+  class Node {
+    -childNodes: list~BaseNode~
+    +addChild(child: BaseNode) None
+    +children() tuple~BaseNode~
+  }
+  class Root {
+    -childNodes: list~BaseNode~
+    +addChild(child: BaseNode) None
+    +children() tuple~BaseNode~
+  }
+  class Leaf {
+    +children() tuple~BaseNode~
+  }
+}
+
+namespace ViewState {
+  class Desktop {
+    -windowSizeBBox: BBox
+    -windowCanvasBBox: BBox
+    -zoomScale: float
+    +resize(width: float, height: float) None
+    +pan(dx: float, dy: float) None
+    +zoomAt(anchor: Point, scaleDelta: float) None
+    +canvasToView(point: Point) Point
+    +viewToCanvas(point: Point) Point
+    +resetViewport() None
+  }
+}
+
+namespace ParserComponent {
+  class Parser {
+    +parse(sourceText: str) list~BaseNode~
+    -splitSections(sourceText: str) dict~str, list[str]~
+    -parseNodeLabels(lines: list~str~) dict~int, str~
+    -parseNodeRegistry(lines, branches, rootIds) dict~int, BaseNode~
+    -parseBranches(lines: list~str~) list~tuple~
+    -branchesFromTrees(lines, labels) tuple
+    -connectBranches(branches, registry) None
+    -parseTrees(lines, registry) None
+  }
+}
+
+namespace Layout {
+  class LayoutCalculator {
+    -measuredSizeCache: dict~BaseNode, BBox~
+    -parentsByNode: dict~BaseNode, list[BaseNode]~
+    -layoutVersion: int
+    +createInitialSteps(nodes, desktop) list~LayoutStep~
+    +recalculate(nodes, changedNode) list~LayoutStep~
+    -measure(node: BaseNode) BBox
+    -buildParentIndex(nodes) None
+    -placeRoots(nodes, viewport) list~LayoutStep~
+    -placeDescendants(root) list~LayoutStep~
+    -resolveSharedNodes(nodes) list~LayoutStep~
+  }
+  class GraphTraversal {
+    +rootNodes(nodes) list~BaseNode~
+    +reachableFrom(start) list~BaseNode~
+    +edgesFrom(start) list~tuple~
+    +allEdges(nodes) list~tuple~
+  }
+  class BBoxCalculator {
+    +forNodes(nodes) BBox
+    +forSubgraph(start) BBox
+  }
+}
+
+namespace ImageOutput {
+  class ImageRenderer {
+    -graphTraversal: GraphTraversal
+    -bboxCalculator: BBoxCalculator
+    -targetCanvas: object | None
+    +renderCanvas(nodes, outputPath) None
+    +renderSubgraph(start, outputPath) None
+    -createTargetCanvas(bounds) object
+    -render(nodes, bounds, targetCanvas, outputPath) None
+    -drawEdges(nodes, targetCanvas) None
+    -drawNodes(nodes, targetCanvas) None
+  }
+}
+
+namespace ModelComponent {
+  class EventEmitter~E~ {
+    -callbacks: dict[E, list[Callable[[], None]]]
+    +subscribe(event: E, callback: Callable[[], None]) None
+    +notify(event: E) None
+  }
+  class ModelEvent {
+    <<enumeration>>
+    NODES_CHANGED
+    LAYOUT_CHANGED
+    SELECTION_CHANGED
+    EDITOR_CHANGED
+    PLAYBACK_CHANGED
+    DESKTOP_CHANGED
+  }
+  class NodeEditorState {
+    -selectedNode: BaseNode
+    -editingText: str
+    -popupBBox: BBox
+    +begin(node: BaseNode, popupBBox: BBox) None
+    +updateDraft(text: str) None
+    +commit() str
+    +cancel() None
+  }
+  class Model {
+    +events: EventEmitter~ModelEvent~
+    -sourceText: str
+    -nodes: list~BaseNode~
+    -canvasBBox: BBox
+    -outputFile: Path | None
+    -desktop: Desktop
+    -nodeEditorState: NodeEditorState | None
+    -currentStep: int
+    -totalSteps: int
+    -isPlaying: bool
+    -layoutSteps: list~LayoutStep~
+    -parser: Parser
+    -layoutCalculator: LayoutCalculator
+    -bboxCalculator: BBoxCalculator
+    -imageRenderer: ImageRenderer
+    +loadFile(inputPath: Path) None
+    +loadText(sourceText: str) None
+    +selectNode(node: BaseNode, popupBBox: BBox) None
+    +clearSelection() None
+    +clearTree() None
+    +renameSelectedNode(text: str) None
+    +showStep(index: int) None
+    +showPreviousStep() None
+    +showNextStep() None
+    +setPlaying(isPlaying: bool) None
+    +exportCanvas(outputPath: Path) None
+    +exportSelectedSubgraph(outputPath: Path) None
+    +resizeDesktop(width: float, height: float) None
+    +panDesktop(dx: float, dy: float) None
+    +zoomDesktopAt(anchor: Point, scaleDelta: float) None
+    +resetDesktopViewport() None
+    -replaceLayoutSteps(steps: list~LayoutStep~) None
+    -applyLayoutStep(step: LayoutStep) None
+    -updateCanvasBBox() None
+    -notify(event: ModelEvent) None
+  }
+}
+
+namespace ViewComponent {
+  class NodeEditorPopupView {
+    -controller: ControllerInputPort
+    -textEntry: QLineEdit
+    +bindController(controller: ControllerInputPort) None
+    +showState(state: NodeEditorState, width: int, height: int) None
+    +hide() None
+    +draftText() str
+  }
+  class CanvasPopupView {
+    -controller: ControllerInputPort
+    +bindController(controller: ControllerInputPort) None
+    +showAt(x: float, y: float, width: int, height: int, hasTree: bool) None
+    +hide() None
+    -deleteTree() None
+  }
+  class DesktopView {
+    -model: Model
+    -scene: QGraphicsScene
+    -canvas: DesktopGraphicsView
+    -nodeEditorPopupView: NodeEditorPopupView
+    -canvasPopupView: CanvasPopupView
+    -controller: ControllerInputPort
+    -canvasRenderer: CanvasRenderer
+    -playbackTimer: QTimer
+    +bindController(controller: ControllerInputPort) None
+    +chooseInputFile() Path | None
+    +chooseOutputFile() Path | None
+    +renderCanvas() None
+    +renderPlaybackControls() None
+    +nodeAt(viewPoint: Point) BaseNode | None
+    +handleWheelEvent(event: QWheelEvent) bool
+    +handleNativeGesture(event: QNativeGestureEvent) bool
+    -onNodesChanged() None
+    -onLayoutChanged() None
+    -onSelectionChanged() None
+    -onPlaybackChanged() None
+    -onDesktopChanged() None
+  }
+  class CanvasRenderer {
+    -model: Model
+    -scene: QGraphicsScene
+    -nodeItems: dict~BaseNode, NodeGraphicsItem~
+    -edgeItems: dict~tuple, QGraphicsLineItem~
+    +render(width: int, height: int) None
+    +syncLayout(width: int, height: int) bool
+    +syncViewport(width: int, height: int) bool
+    +nodeAt(viewPoint: Point) BaseNode | None
+  }
+  class DesktopGraphicsView
+  class NodeGraphicsItem {
+    +node: BaseNode
+    +updateFromNode(isSelected: bool) None
+  }
+}
+
+namespace ControllerComponent {
+  class ControllerInputPort {
+    <<interface>>
+    +openFile(inputPath: Path) None
+    +handleDrop(paths: list~Path~) None
+    +handlePointerPress(point: Point) None
+    +handlePointerMove(point: Point) None
+    +handlePointerRelease(point: Point) bool
+    +handleWheel(deltaX: float, deltaY: float) None
+    +handleZoom(anchor: Point, scaleDelta: float) None
+    +handleNodeClick(node: BaseNode, popupBBox: BBox) None
+    +handleCanvasClick() None
+    +clearTree() None
+    +confirmRename(text: str) None
+    +cancelPopup() None
+    +setPlaying(isPlaying: bool) None
+    +showNextStep() None
+    +exportCanvas(outputPath: Path) None
+    +exportSelectedSubgraph(outputPath: Path) None
+    +resizeDesktop(width: float, height: float) None
+  }
+  class ModelCommandPort {
+    <<interface>>
+    +loadFile(inputPath: Path) None
+    +selectNode(node: BaseNode, popupBBox: BBox) None
+    +clearSelection() None
+    +clearTree() None
+    +renameSelectedNode(text: str) None
+    +showStep(index: int) None
+    +showPreviousStep() None
+    +showNextStep() None
+    +setPlaying(isPlaying: bool) None
+    +exportCanvas(outputPath: Path) None
+    +exportSelectedSubgraph(outputPath: Path) None
+    +resizeDesktop(width: float, height: float) None
+    +panDesktop(dx: float, dy: float) None
+    +zoomDesktopAt(anchor: Point, scaleDelta: float) None
+    +resetDesktopViewport() None
+  }
+  class Controller {
+    -commands: ModelCommandPort
+    -pressPoint: Point | None
+    -lastDragPoint: Point | None
+    -isDragging: bool
+    +openFile(inputPath: Path) None
+    +handleDrop(paths: list~Path~) None
+    +handlePointerPress(point: Point) None
+    +handlePointerMove(point: Point) None
+    +handlePointerRelease(point: Point) bool
+    +handleWheel(deltaX: float, deltaY: float) None
+    +handleZoom(anchor: Point, scaleDelta: float) None
+    +handleNodeClick(node: BaseNode, popupBBox: BBox) None
+    +handleCanvasClick() None
+    +clearTree() None
+    +confirmRename(text: str) None
+    +cancelPopup() None
+    +setPlaying(isPlaying: bool) None
+    +showPreviousStep() None
+    +showNextStep() None
+    +seekStep(index: int) None
+    +exportCanvas(outputPath: Path) None
+    +exportSelectedSubgraph(outputPath: Path) None
+    +resizeDesktop(width: float, height: float) None
+    +resetDesktopViewport() None
+  }
+}
+
+namespace ApplicationComponent {
+  class ForestApp {
+    -application: QApplication
+    -model: Model
+    -desktopView: DesktopView
+    -controller: Controller
+    +build() None
+    +run() None
+  }
+}
+
+BaseNode <|-- Node
+BaseNode <|-- Root
+BaseNode <|-- Leaf
+BaseNode *-- BBox : bbox
+Desktop *-- BBox : viewport
+LayoutStep o-- "0..*" BaseNode : positions
+LayoutStep o-- "0..*" BBox : positions
+
+Parser ..> BaseNode : creates
+LayoutCalculator ..> BaseNode : calculates
+LayoutCalculator ..> Desktop : reads viewport
+LayoutCalculator ..> LayoutStep : creates
+BBoxCalculator ..> GraphTraversal : collects nodes
+ImageRenderer *-- GraphTraversal : graphTraversal
+ImageRenderer *-- BBoxCalculator : bboxCalculator
+
+Model *-- EventEmitter : events
+EventEmitter ..> ModelEvent : event type
+Model o-- "0..*" BaseNode : nodes
+Model *-- Desktop : desktop
+Model *-- "0..1" NodeEditorState : editor state
+Model o-- "0..*" LayoutStep : layout steps
+Model *-- Parser : parser
+Model *-- LayoutCalculator : layout calculator
+Model *-- BBoxCalculator : bbox calculator
+Model *-- ImageRenderer : image renderer
+
+DesktopView ..> Model : reads and subscribes
+DesktopView *-- NodeEditorPopupView : popup
+DesktopView *-- CanvasPopupView : popup
+DesktopView *-- CanvasRenderer : renders
+DesktopView *-- DesktopGraphicsView : input surface
+CanvasRenderer *-- NodeGraphicsItem : node items
+DesktopView --> ControllerInputPort : sends input
+NodeEditorPopupView --> ControllerInputPort : sends input
+CanvasPopupView --> ControllerInputPort : sends input
+Controller ..|> ControllerInputPort : receives input
+Controller --> ModelCommandPort : sends messages
+Model ..|> ModelCommandPort : receives messages
+ForestApp *-- Model : model
+ForestApp *-- DesktopView : view
+ForestApp *-- Controller : controller
+
+note for BaseNode "全ノードに共通する表示情報と操作"
+note for Desktop "表示範囲、スクロール位置、拡大率を管理"
+note for Parser "Forestテキストから共有ノードを含むグラフを生成"
+note for LayoutCalculator "初期配置から樹状配置までの工程を生成"
+note for ImageRenderer "Canvas全体または部分グラフをPNG画像へ出力"
+note for EventEmitter "イベントごとに複数のcallbackを保持し、登録順に呼び出す"
+note for ModelEvent "Viewが再読込する状態領域"
+note for Model "状態遷移とユースケースを集約"
+note for DesktopView "PySide6のメイン画面とGraphics Sceneを表示"
+note for CanvasRenderer "Model状態をQGraphicsItemへ差分反映し、ノードを判定"
+note for Controller "ModelとViewの状態を参照せず、入力を薄く正規化して更新メッセージへ変換"
+note for ForestApp "MVC各要素を構成して起動"
+
+classDef mvc fill:#eaf2ff,stroke:#54749f,color:#20334d,stroke-width:1.5px
+classDef core fill:#fff8e8,stroke:#8a7446,color:#3f3522,stroke-width:1.5px
+classDef support fill:#f3f4f6,stroke:#6b7280,color:#27303f,stroke-width:1.5px
+cssClass "ForestApp,Model,ModelCommandPort,ControllerInputPort,EventEmitter,ModelEvent,NodeEditorState,Desktop,DesktopView,DesktopGraphicsView,CanvasRenderer,NodeGraphicsItem,NodeEditorPopupView,CanvasPopupView,Controller" mvc
+cssClass "BaseNode,Leaf,Node,Root,Parser,LayoutCalculator,BBoxCalculator,GraphTraversal,ImageRenderer" core
+cssClass "Point,BBox,LayoutStep,Constants" support

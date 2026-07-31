@@ -52,6 +52,7 @@
       <li><a href="#Parser">Parser</a></li>
       <li><a href="#GraphTraversal">GraphTraversal</a>、<a href="#BBoxCalculator">BBoxCalculator</a>、<a href="#LayoutCalculator">LayoutCalculator</a></li>
       <li><a href="#ImageRenderer">ImageRenderer</a></li>
+      <li><a href="#EventEmitter">EventEmitter</a>、<a href="#NodeEditorState">NodeEditorState</a>、<a href="#Desktop">Desktop</a>、<a href="#Model">Model</a></li>
     </ul>
 
     <div class="belt"><h3><a id="Point">Point（値オブジェクト）</a></h3></div>
@@ -211,6 +212,200 @@
       <tr><td><code>_depthsFor(nodes)</code></td><td><code>dict[BaseNode, int]</code></td><td>protected</td><td>単体テスト</td><td>共有ノードをすべての親より後段に置き、循環があっても停止する深さを生成する。</td><td>良好（2026年7月30日）</td></tr>
     </tbody></table>
 
+    <div class="belt"><h3><a id="EventEmitter">EventEmitter（イベント通知）</a></h3></div>
+    <table class="bordered-table" aria-label="EventEmitterの属性テスト"><tbody>
+      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
+      <tr><td><code>_callbacks</code></td><td>インスタンス</td><td>protected</td><td>
+            イベント別の複数callbackを登録順に保持し、イベント間で分離することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+    </tbody></table>
+    <table class="bordered-table" aria-label="EventEmitterのメソッドテスト"><tbody>
+      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
+      <tr><td><code>__init__()</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+            購読のない状態で生成し、未登録イベントを安全に通知できることを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td rowspan="3"><code>subscribe(event, callback)</code></td><td rowspan="3"><code>None</code></td><td rowspan="3">public</td><td>結合テスト</td><td>同一イベントへ複数Viewのcallbackを登録できることを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td>単体テスト</td><td>同一callbackの重複登録を1回に抑えることを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td>単体テスト</td><td>呼び出し不能な値を拒否することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td rowspan="4"><code>notify(event)</code></td><td rowspan="4"><code>None</code></td><td rowspan="4">public</td><td>結合テスト</td><td>同一イベントの複数Viewを登録順に通知することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td>単体テスト</td><td>異なるイベントのcallbackを呼び出さないことを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td>単体テスト</td><td>
+            通知中に追加されたcallbackを次回の通知から呼び出すことを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td>単体テスト</td><td>
+            callbackの例外を呼出元へ伝播し、後続callbackを実行しないことを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+    </tbody></table>
+    <div class="belt"><h3><a id="NodeEditorState">NodeEditorState（ノード編集状態）</a></h3></div>
+    <table class="bordered-table" aria-label="NodeEditorStateの属性テスト"><tbody>
+      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
+      <tr><td><code>_selectedNode</code></td><td>インスタンス</td><td>protected</td><td>
+            編集中のノードを保持し、確定または取消後に解放することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_editingText</code></td><td>インスタンス</td><td>protected</td><td>ノード本体と分離した下書きを保持することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_popupBBox</code></td><td>インスタンス</td><td>protected</td><td>
+            編集ポップアップ領域を保持し、取消後に零領域へ戻すことを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+    </tbody></table>
+    <table class="bordered-table" aria-label="NodeEditorStateのメソッドテスト"><tbody>
+      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
+      <tr><td><code>__init__()</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>未選択、空文字列、零領域の初期状態を生成することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>selectedNode</code></td><td><code>BaseNode | None</code></td><td>public property</td><td>単体テスト</td><td>選択ノードまたは未選択を返すことを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>editingText</code></td><td><code>str</code></td><td>public property</td><td>単体テスト</td><td>現在の下書きを返すことを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>popupBBox</code></td><td><code>BBox</code></td><td>public property</td><td>単体テスト</td><td>ポップアップ領域を返すことを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>isEditing</code></td><td><code>bool</code></td><td>public property</td><td>単体テスト</td><td>編集開始から確定または取消まで真になることを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td rowspan="2"><code>begin(node, popupBBox)</code></td><td rowspan="2"><code>None</code></td><td rowspan="2">public</td><td>単体テスト</td><td>ノード名を初期下書きとして編集を開始することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td>単体テスト</td><td>不正なノードまたはBBoxを拒否することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>updateDraft(text)</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+            編集中だけ文字列の下書きを更新し、未編集と非文字列を拒否することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>commit()</code></td><td><code>str</code></td><td>public</td><td>単体テスト</td><td>
+            下書きを返して状態を初期化し、未編集時は拒否することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>cancel()</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>選択、下書き、ポップアップ領域を初期化することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_requireEditing()</code></td><td><code>None</code></td><td>protected</td><td>単体テスト</td><td>未編集時の下書き更新と確定を拒否することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+    </tbody></table>
+    <div class="belt"><h3><a id="Desktop">Desktop（表示領域状態）</a></h3></div>
+    <table class="bordered-table" aria-label="Desktopの属性テスト"><tbody>
+      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
+      <tr><td><code>_windowSizeBBox</code></td><td>インスタンス</td><td>protected</td><td>非負のウィンドウ寸法を保持することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_windowCanvasBBox</code></td><td>インスタンス</td><td>protected</td><td>
+            パンと拡大率を反映したキャンバス表示領域を保持することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_zoomScale</code></td><td>インスタンス</td><td>protected</td><td>既定値1.0と定数範囲内の拡大率を保持することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+    </tbody></table>
+    <table class="bordered-table" aria-label="Desktopのメソッドテスト"><tbody>
+      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
+      <tr><td><code>__init__(width, height)</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+            指定寸法または零寸法で初期化し、負の寸法を拒否することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>windowSizeBBox</code></td><td><code>BBox</code></td><td>public property</td><td>単体テスト</td><td>現在のウィンドウ領域を返すことを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>windowCanvasBBox</code></td><td><code>BBox</code></td><td>public property</td><td>単体テスト</td><td>現在表示中のキャンバス領域を返すことを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>zoomScale</code></td><td><code>float</code></td><td>public property</td><td>単体テスト</td><td>現在の拡大率を返すことを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>resize(width, height)</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+            拡大率を維持してウィンドウと表示領域を更新し、負の寸法を拒否することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>pan(dx, dy)</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+            View座標の移動量を拡大率で換算して表示領域へ反映することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td rowspan="2"><code>zoomAt(anchor, scaleDelta)</code></td><td rowspan="2"><code>None</code></td><td rowspan="2">public</td><td>単体テスト</td><td>アンカー位置を固定して拡大し、上下限へ丸めることを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td>単体テスト</td><td>0以下の倍率を拒否することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>canvasToView(point)</code></td><td><code>Point</code></td><td>public</td><td>単体テスト</td><td>キャンバス座標をView座標へ変換することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>viewToCanvas(point)</code></td><td><code>Point</code></td><td>public</td><td>単体テスト</td><td>
+            View座標をキャンバス座標へ変換し、往復変換できることを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>resetViewport()</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+            ウィンドウ寸法を維持してパン位置と拡大率を初期化することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_validateSize(width, height)</code></td><td><code>None</code></td><td>protected static</td><td>単体テスト</td><td>幅または高さが負の値である場合に拒否することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+    </tbody></table>
+    <div class="belt"><h3><a id="Model">Model（状態とユースケース）</a></h3></div>
+    <table class="bordered-table" aria-label="Modelの属性テスト"><tbody>
+      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
+      <tr><td><code>events</code></td><td>インスタンス</td><td>public</td><td>
+            ModelEvent別の購読と複数Viewへの通知に使用できることを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_sourceText</code></td><td>インスタンス</td><td>protected</td><td>最後に正常解析された入力文字列を保持することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_nodes</code></td><td>インスタンス</td><td>protected</td><td>
+            解析済み開始ノードを保持し、外部へタプルで公開することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_canvasBBox</code></td><td>インスタンス</td><td>protected</td><td>
+            適用済み配置の描画領域を保持し、空入力では零領域になることを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_outputFile</code></td><td>インスタンス</td><td>protected</td><td>最後に正常出力した画像パスを保持することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_desktop</code></td><td>インスタンス</td><td>protected</td><td>
+            表示領域状態を保持し、4操作を委譲して変更通知することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_nodeEditorState</code></td><td>インスタンス</td><td>protected</td><td>
+            選択中だけ編集状態を保持し、確定または取消後に解放することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_currentStep</code></td><td>インスタンス</td><td>protected</td><td>
+            現在の配置工程番号を保持し、前後移動の境界を越えないことを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_totalSteps</code></td><td>インスタンス</td><td>protected</td><td>配置工程の総数を保持することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_isPlaying</code></td><td>インスタンス</td><td>protected</td><td>
+            再生状態を保持し、値が変化した場合だけ通知することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_layoutSteps</code></td><td>インスタンス</td><td>protected</td><td>配置工程を保持し、外部へタプルで公開することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_parser</code></td><td>インスタンス</td><td>protected</td><td>
+            入力解析を委譲し、解析失敗時に既存状態を変更しないことを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_layoutCalculator</code></td><td>インスタンス</td><td>protected</td><td>初期配置と名称変更後の再配置を委譲することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_bboxCalculator</code></td><td>インスタンス</td><td>protected</td><td>配置適用後の描画領域計算を委譲することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_imageRenderer</code></td><td>インスタンス</td><td>protected</td><td>Canvas全体と選択部分の画像出力を委譲することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+    </tbody></table>
+    <table class="bordered-table" aria-label="Modelのメソッドテスト"><tbody>
+      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
+      <tr><td><code>__init__(...)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
+            空のModel状態と依存オブジェクトを生成し、テスト用依存も注入できることを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>sourceText</code
+            >、<code>canvasBBox</code>、<code>outputFile</code>、<code>desktop</code>、<code>nodeEditorState</code>、<code>currentStep</code>、<code>totalSteps</code>、<code
+              >isPlaying</code
+            ></td><td>各状態値</td><td>public property</td><td>単体テスト</td><td>各状態を変更操作後に読み取れることを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>nodes</code>、<code>layoutSteps</code></td><td><code>tuple</code></td><td>public property</td><td>単体テスト</td><td>内部の可変リストを公開せずタプルを返すことを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>loadFile(inputPath)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
+            UTF-8ファイルを読み込んで解析へ渡し、Path以外を拒否することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td rowspan="3"><code>loadText(sourceText)</code></td><td rowspan="3"><code>None</code></td><td rowspan="3">public</td><td>結合テスト</td><td>
+            解析、初期配置、BBox計算を行い、状態領域ごとのイベントを通知することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td>単体テスト</td><td>
+            空入力でノード、工程、描画領域を空状態へ置き換えることを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td>単体テスト</td><td>
+            非文字列を拒否し、解析失敗時に既存状態を変更しないことを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>selectNode(node, popupBBox)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
+            Model内のノードだけを選択して編集を開始し、対象外ノードと不正BBoxを拒否することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>clearSelection()</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+            選択を解除して通知し、未選択時は状態と通知を変えないことを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td rowspan="2"><code>renameSelectedNode(text)</code></td><td rowspan="2"><code>None</code></td><td rowspan="2">public</td><td>結合テスト</td><td>
+            選択ノードを改名して再配置し、編集状態を解除して通知することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td>単体テスト</td><td>
+            未選択と非文字列を拒否し、再配置失敗時は元の名称と選択状態を維持することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>showStep(index)</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+            指定工程を適用して通知し、範囲外番号と整数以外を拒否することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>showPreviousStep()</code>、<code>showNextStep()</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+            前後の工程へ移動し、先頭と末尾では状態を変えないことを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>setPlaying(isPlaying)</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+            boolだけを受け付け、値が変化した場合だけ再生状態を通知することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>exportCanvas(outputPath)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
+            全体画像出力を委譲して成功パスを保持し、Path以外を拒否することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>exportSelectedSubgraph(outputPath)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
+            選択部分の画像出力を委譲して成功パスを保持し、未選択を拒否することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>resizeDesktop(width, height)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
+            寸法変更をDesktopへ委譲し、複数ViewへDESKTOP_CHANGEDを通知することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>panDesktop(dx, dy)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
+            パンをDesktopへ委譲し、複数ViewへDESKTOP_CHANGEDを通知することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>zoomDesktopAt(anchor, scaleDelta)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
+            アンカー固定ズームを委譲し、成功時だけ複数Viewへ通知することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>resetDesktopViewport()</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
+            表示領域の初期化を委譲し、複数ViewへDESKTOP_CHANGEDを通知することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_replaceLayoutSteps(steps)</code></td><td><code>None</code></td><td>protected</td><td>単体テスト</td><td>
+            工程一覧、総数、現在番号を置換し、先頭工程または空状態を適用することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_applyLayoutStep(step)</code></td><td><code>None</code></td><td>protected</td><td>単体テスト</td><td>工程内のBBoxを各ノードへ適用することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_updateCanvasBBox()</code></td><td><code>None</code></td><td>protected</td><td>結合テスト</td><td>BBoxCalculatorから全体描画領域を取得することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_notify(event)</code></td><td><code>None</code></td><td>protected</td><td>結合テスト</td><td>
+            状態変更に対応するModelEventをEventEmitterへ委譲することを確認する。
+          </td><td>良好（2026年7月31日）</td></tr>
+      <tr><td><code>_validateOutputPath(outputPath)</code></td><td><code>None</code></td><td>protected static</td><td>単体テスト</td><td>画像出力先がPath以外の場合に拒否することを確認する。</td><td>良好（2026年7月31日）</td></tr>
+    </tbody></table>
+
     <div class="belt"><h3><a id="ImageRenderer">ImageRenderer（PNG出力）</a></h3></div>
     <table class="bordered-table" aria-label="ImageRendererの属性テスト"><tbody>
       <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
@@ -229,7 +424,7 @@
     </tbody></table>
     <hr />
     <div class="right-small">
-      Copyright 20xx Project xx, Updated: 2026/07/30 (Created: 2009/11/11)
+      Copyright 20xx Project xx, Updated: 2026/07/31 (Created: 2009/11/11)
     </div>
   </body>
 </html>

@@ -26,8 +26,18 @@
         background-color: #eeeeee;
         text-align: left;
       }
+      .old-design {
+        margin: 20px 0px;
+        padding: 8px 12px;
+        border: 1px solid #cccccc;
+        background-color: #fafafa;
+      }
+      .old-design summary {
+        cursor: pointer;
+        font-weight: bold;
+      }
     </style>
-    <title>ソフトウェア工学II「樹状整列」詳細設計書（2026年7月28日時点）</title>
+    <title>ソフトウェア工学II「樹状整列」詳細設計書（2026年7月31日時点）</title>
   </head>
   <body>
     <div id="menu">
@@ -47,12 +57,12 @@
       </ul>
     </div>
     <hr />
-    <h2>ソフトウェア工学II「樹状整列」詳細設計書（2026年7月28日時点）</h2>
+    <h2>ソフトウェア工学II「樹状整列」詳細設計書（2026年7月31日時点）</h2>
     <div class="belt">
       <h3><a id="SekkeiGaiyou">設計概要</a></h3>
     </div>
     <p>
-      本詳細設計は、要求仕様書および2026年7月22日時点の基本設計を、
+      本詳細設計は、要求仕様書および2026年7月31日時点の基本設計を、
       PythonとCustomTkinterで実装できる粒度へ具体化したものである。
       クラスの責務、属性、公開メソッド、型、保持関係および実装上の依存関係を示す。
     </p>
@@ -73,7 +83,9 @@
         完成配置では木ごとに領域を分け、親を子ノード群の中央へ配置する。
       </li>
       <li>
-        DesktopViewとNodeEditorPopupViewはModelObserverとして変更通知を受け、
+        DesktopViewとNodeEditorPopupViewはEventEmitterへModelEventごとのcallbackを登録する。
+        Modelが変更を通知するとEventEmitterが対応するcallbackを呼び出し、
+        各ViewはModelから最新の表示値を読み直す。
         Controllerは画面操作をModelのユースケースへ変換する。
       </li>
       <li>
@@ -85,20 +97,20 @@
       <h3><a id="ShousaiKousei">詳細構成</a></h3>
     </div>
     <p>
-      図のMermaidソースは
-      <a href="detail-design-2026-07-28.mmd"
-        ><code>detail-design-2026-07-28.mmd</code></a
-      >から読み込む。
-    </p>
-    <p>
-      外枠は実装時に一つの部品として扱う範囲を示す。
+      namespace境界をまたぐ関係線によるレイアウトの複雑化を避けるため、
+      パッケージ間の全体構成図と、責務ごとのクラス図へ分割して示す。
       クラスはMVC関係を淡い青、グラフと処理に関するクラスを淡い黄、
       値オブジェクトと定数を灰色で示す。関係線の色は基本設計図と共通である。
+      属性、引数または戻り値の型から自明な一時的依存は省略し、
+      所有関係、継承関係、MVC・Observerおよび主要な処理委譲を示す関係に絞る。
     </p>
     <p>
       基本設計にない要素は、新しい機能ではなく実装粒度への具体化である。
       Pointは画面操作と座標変換で使う点、LayoutStepは整列アニメーションの1工程分、
       CanvasPopupViewはCanvas全体の画像出力小窓を表す。
+      EventEmitterはObserverパターンの通知機構を具体化し、
+      ModelEventはViewが再読込する状態領域を列挙する。
+      callbackと購読解除方法の具体的な表現は実装詳細とし、独立したクラスにはしない。
       NodeEditorStateは基本設計どおりModelが保持し、選択ノード、未確定の編集文字列、
       小窓の表示領域を管理する。BBoxは基本設計に合わせ、
       位置と大きさだけを保持する値オブジェクトとし、範囲計算はBBoxCalculatorなどの担当部品で行う。
@@ -133,7 +145,7 @@
           <td>アニメーション</td>
           <td>Controller、Model、Layout、View</td>
           <td>
-            LayoutStepを工程単位の配置として保持し、Controllerの再生操作に応じてModelが工程を切り替え、Viewへ通知する。
+            LayoutStepを工程単位の配置として保持し、Controllerの再生操作に応じてModelが工程を切り替える。ModelはPLAYBACK_CHANGEDおよびLAYOUT_CHANGEDを通知し、Viewが表示値を読み直す。
           </td>
         </tr>
         <tr>
@@ -159,14 +171,105 @@
         </tr>
       </tbody>
     </table>
-    <div class="mermaid-container uml-shared-aggregation">
-      <pre class="mermaid" data-mermaid-source="detail-design-2026-07-28.mmd">
-詳細設計図を読み込んでいます。</pre>
+    <div class="uml-diagram-grid">
+      <section class="uml-diagram-panel">
+        <h4>パッケージ間の全体構成</h4>
+        <p>
+          Mermaidソースは
+          <a href="detail-design-2026-07-31.mmd"
+            ><code>detail-design-2026-07-31.mmd</code></a
+          >から読み込む。
+        </p>
+        <div class="mermaid-container uml-shared-aggregation">
+          <pre
+            class="mermaid"
+            data-mermaid-source="detail-design-2026-07-31.mmd"
+          >
+全体構成図を読み込んでいます。</pre>
+        </div>
+      </section>
+      <section class="uml-diagram-panel">
+        <h4>ドメインと表示状態</h4>
+        <p>
+          Mermaidソースは
+          <a href="detail-design-2026-07-31-domain.mmd"
+            ><code>detail-design-2026-07-31-domain.mmd</code></a
+          >から読み込む。
+        </p>
+        <div class="mermaid-container uml-shared-aggregation">
+          <pre
+            class="mermaid"
+            data-mermaid-source="detail-design-2026-07-31-domain.mmd"
+          >
+ドメインクラス図を読み込んでいます。</pre>
+        </div>
+      </section>
+      <section class="uml-diagram-panel">
+        <h4>解析・配置・画像出力</h4>
+        <p>
+          Mermaidソースは
+          <a href="detail-design-2026-07-31-processing.mmd"
+            ><code>detail-design-2026-07-31-processing.mmd</code></a
+          >から読み込む。
+        </p>
+        <div class="mermaid-container uml-shared-aggregation">
+          <pre
+            class="mermaid"
+            data-mermaid-source="detail-design-2026-07-31-processing.mmd"
+          >
+処理クラス図を読み込んでいます。</pre>
+        </div>
+      </section>
+      <section class="uml-diagram-panel">
+        <h4>Modelとイベント通知</h4>
+        <p>
+          Mermaidソースは
+          <a href="detail-design-2026-07-31-model.mmd"
+            ><code>detail-design-2026-07-31-model.mmd</code></a
+          >から読み込む。
+        </p>
+        <div class="mermaid-container uml-shared-aggregation">
+          <pre
+            class="mermaid"
+            data-mermaid-source="detail-design-2026-07-31-model.mmd"
+          >
+Modelクラス図を読み込んでいます。</pre>
+        </div>
+      </section>
+      <section class="uml-diagram-panel">
+        <h4>View・Controller・Application</h4>
+        <p>
+          Mermaidソースは
+          <a href="detail-design-2026-07-31-presentation.mmd"
+            ><code>detail-design-2026-07-31-presentation.mmd</code></a
+          >から読み込む。
+        </p>
+        <div class="mermaid-container uml-shared-aggregation">
+          <pre
+            class="mermaid"
+            data-mermaid-source="detail-design-2026-07-31-presentation.mmd"
+          >
+View・Controllerクラス図を読み込んでいます。</pre>
+        </div>
+      </section>
     </div>
+    <details class="old-design" id="OldDetailDesign20260728">
+      <summary>2026年7月28日時点の詳細設計図</summary>
+      <p>
+        旧版のMermaidソースは
+        <a href="detail-design-2026-07-28.mmd"
+          ><code>detail-design-2026-07-28.mmd</code></a
+        >から確認できる。
+      </p>
+      <div class="mermaid-container uml-shared-aggregation">
+        <pre class="mermaid" data-mermaid-source="detail-design-2026-07-28.mmd">
+詳細設計図を読み込んでいます。</pre>
+      </div>
+    </details>
     <script type="module" src="../assets/js/uml.js"></script>
     <hr />
     <div class="right-small">
-      Copyright 20xx Project xx, Updated: 2026/07/30 (Created: 2009/11/11)
+      Copyright 20xx Project xx, Updated: 2026/07/31 (Created: 2009/11/11)
     </div>
   </body>
 </html>
