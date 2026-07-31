@@ -117,6 +117,22 @@ def testCreateApplicationReusesSingleQtApplication(qtApplication: QApplication) 
     assert first.applicationName() == "Forest"
 
 
+def testRunPropagatesBuildFailureWithoutStartingEventLoop() -> None:
+    application, qtApplication, _, _, _ = buildApplicationFakes()
+
+    def failToBuild() -> Any:
+        raise RuntimeError("cannot create model")
+
+    application._modelFactory = failToBuild
+
+    with pytest.raises(RuntimeError, match="cannot create model"):
+        application.run()
+
+    assert qtApplication.execCalls == 0
+    assert application._application is None
+    assert application._desktopView is None
+
+
 def waitUntil(application: QApplication, predicate: Any, timeout: float = 3.0) -> None:
     deadline = monotonic() + timeout
     while monotonic() < deadline:

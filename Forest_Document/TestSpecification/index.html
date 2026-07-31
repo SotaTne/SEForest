@@ -41,387 +41,2030 @@
     </div>
     <hr />
     <h2>ソフトウェア工学II「樹状整列」テスト仕様書</h2>
-    <div class="belt"><h3><a id="LogicTests">ロジック単体・結合テスト</a></h3></div>
+    <div class="belt">
+      <h3><a id="LogicTests">Python実装 単体・結合・操作テスト</a></h3>
+    </div>
     <p>
-      要求仕様書、基本設計書および詳細設計書に基づくロジック部品を対象とする。
-      MVC、GUI操作およびアプリケーション起動から表示完了までの性能は対象外とする。
+      <code>Forest_Program</code>の現行実装を対象に、ロジック、MVC、Qt
+      Viewおよびアプリケーション結合を検証する。
+      2026年7月31日に全156件を実行し、すべて成功した。実ファイルダイアログ、実ドラッグ＆ドロップ、
+      トラックパッドの実ネイティブピンチ操作は自動テストの対象外とする。
     </p>
     <ul>
-      <li><a href="#Point">Point</a>、<a href="#BBox">BBox</a>、<a href="#LayoutStep">LayoutStep</a>、<a href="#Constants">Constants</a></li>
-      <li><a href="#BaseNode">BaseNode</a>、<a href="#NodeRoot">Node・Root</a>、<a href="#Leaf">Leaf</a></li>
+      <li>
+        <a href="#Point">Point</a>、<a href="#BBox">BBox</a>、<a
+          href="#LayoutStep"
+          >LayoutStep</a
+        >、<a href="#Constants">Constants</a>
+      </li>
+      <li>
+        <a href="#BaseNode">BaseNode</a>、<a href="#NodeRoot">Node・Root</a>、<a
+          href="#Leaf"
+          >Leaf</a
+        >
+      </li>
       <li><a href="#Parser">Parser</a></li>
-      <li><a href="#GraphTraversal">GraphTraversal</a>、<a href="#BBoxCalculator">BBoxCalculator</a>、<a href="#LayoutCalculator">LayoutCalculator</a></li>
+      <li>
+        <a href="#GraphTraversal">GraphTraversal</a>、<a href="#BBoxCalculator"
+          >BBoxCalculator</a
+        >、<a href="#LayoutCalculator">LayoutCalculator</a>
+      </li>
       <li><a href="#ImageRenderer">ImageRenderer</a></li>
-      <li><a href="#EventEmitter">EventEmitter</a>、<a href="#NodeEditorState">NodeEditorState</a>、<a href="#Desktop">Desktop</a>、<a href="#Model">Model</a></li>
+      <li>
+        <a href="#EventEmitter">EventEmitter</a>、<a href="#NodeEditorState"
+          >NodeEditorState</a
+        >、<a href="#Desktop">Desktop</a>、<a href="#Model">Model</a>
+      </li>
+      <li><a href="#Controller">Controller</a></li>
+      <li><a href="#QtView">CanvasRenderer・NodeGraphicsItem・ViewTheme</a></li>
+      <li><a href="#Application">ForestApp・Qtアプリケーション結合</a></li>
     </ul>
 
-    <div class="belt"><h3><a id="Point">Point（値オブジェクト）</a></h3></div>
-    <table class="bordered-table" aria-label="Pointの属性テスト"><tbody>
-      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>x</code>、<code>y</code></td><td>インスタンス</td><td>public</td><td>正負の浮動小数点座標を保持し、同値比較できることを確認する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
+    <div class="belt">
+      <h3><a id="Point">Point（値オブジェクト）</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="Pointの属性テスト">
+      <tbody>
+        <tr>
+          <th>属性（インスタンス変数）</th>
+          <th>束縛</th>
+          <th>分類</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>x</code>、<code>y</code></td>
+          <td>インスタンス</td>
+          <td>public</td>
+          <td>正負の浮動小数点座標を保持し、同値比較できることを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <div class="belt"><h3><a id="BBox">BBox（値オブジェクト）</a></h3></div>
-    <table class="bordered-table" aria-label="BBoxの属性テスト"><tbody>
-      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>x</code>、<code>y</code>、<code>width</code>、<code>height</code></td><td>インスタンス</td><td>public</td><td>位置と非負の幅・高さを保持することを確認する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
-    <table class="bordered-table" aria-label="BBoxのメソッドテスト"><tbody>
-      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>__post_init__()</code></td><td><code>None</code></td><td>protected</td><td>単体テスト</td><td>負の幅または高さを拒否することを確認する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
+    <div class="belt">
+      <h3><a id="BBox">BBox（値オブジェクト）</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="BBoxの属性テスト">
+      <tbody>
+        <tr>
+          <th>属性（インスタンス変数）</th>
+          <th>束縛</th>
+          <th>分類</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td>
+            <code>x</code>、<code>y</code>、<code>width</code>、<code
+              >height</code
+            >
+          </td>
+          <td>インスタンス</td>
+          <td>public</td>
+          <td>位置と非負の幅・高さを保持することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="bordered-table" aria-label="BBoxのメソッドテスト">
+      <tbody>
+        <tr>
+          <th>メソッド（操作）</th>
+          <th>応答</th>
+          <th>分類</th>
+          <th>テスト種別</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>__post_init__()</code></td>
+          <td><code>None</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>負の幅または高さを拒否することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <div class="belt"><h3><a id="LayoutStep">LayoutStep（値オブジェクト）</a></h3></div>
-    <table class="bordered-table" aria-label="LayoutStepの属性テスト"><tbody>
-      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>index</code></td><td>インスタンス</td><td>public</td><td>非負の工程番号を保持することを確認する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>positions</code></td><td>インスタンス</td><td>public</td><td>元辞書から独立した変更不能の配置を保持することを確認する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
-    <table class="bordered-table" aria-label="LayoutStepのメソッドテスト"><tbody>
-      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>__post_init__()</code></td><td><code>None</code></td><td>protected</td><td>単体テスト</td><td>負の工程番号を拒否し、配置のスナップショットを作ることを確認する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
+    <div class="belt">
+      <h3><a id="LayoutStep">LayoutStep（値オブジェクト）</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="LayoutStepの属性テスト">
+      <tbody>
+        <tr>
+          <th>属性（インスタンス変数）</th>
+          <th>束縛</th>
+          <th>分類</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>index</code></td>
+          <td>インスタンス</td>
+          <td>public</td>
+          <td>非負の工程番号を保持することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>positions</code></td>
+          <td>インスタンス</td>
+          <td>public</td>
+          <td>元辞書から独立した変更不能の配置を保持することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="bordered-table" aria-label="LayoutStepのメソッドテスト">
+      <tbody>
+        <tr>
+          <th>メソッド（操作）</th>
+          <th>応答</th>
+          <th>分類</th>
+          <th>テスト種別</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>__post_init__()</code></td>
+          <td><code>None</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>
+            負の工程番号を拒否し、配置のスナップショットを作ることを確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <div class="belt"><h3><a id="Constants">Constants（定数）</a></h3></div>
-    <table class="bordered-table" aria-label="Constantsの属性テスト"><tbody>
-      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>なし</code></td><td><code>なし</code></td><td><code>なし</code></td><td>定数はクラス属性として保持する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
-    <table class="bordered-table" aria-label="Constantsのメソッドテスト"><tbody>
-      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>__new__()</code></td><td><code>Constants</code></td><td>protected</td><td>単体テスト</td><td>インスタンス化を拒否することを確認する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>FONT_FAMILY</code>、<code>FONT_SIZE</code>、<code>HORIZONTAL_SPACING</code>、<code>VERTICAL_SPACING</code></td><td>各定数値</td><td>public class</td><td>単体テスト</td><td>Serif、12ポイント、横25px、縦2pxであることを確認する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>loadSerifFont()</code></td><td><code>ImageFont</code></td><td>public static</td><td>単体テスト</td><td>利用可能なSerif系フォントを12ポイントで読み込み、文字領域を計測できることを確認する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
+    <div class="belt">
+      <h3><a id="Constants">Constants（定数）</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="Constantsの属性テスト">
+      <tbody>
+        <tr>
+          <th>属性（インスタンス変数）</th>
+          <th>束縛</th>
+          <th>分類</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>なし</code></td>
+          <td><code>なし</code></td>
+          <td><code>なし</code></td>
+          <td>定数はクラス属性として保持する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="bordered-table" aria-label="Constantsのメソッドテスト">
+      <tbody>
+        <tr>
+          <th>メソッド（操作）</th>
+          <th>応答</th>
+          <th>分類</th>
+          <th>テスト種別</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>__new__()</code></td>
+          <td><code>Constants</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>インスタンス化を拒否することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>
+            <code>FONT_FAMILY</code
+            >、<code>FONT_SIZE</code>、<code>HORIZONTAL_SPACING</code>、<code
+              >VERTICAL_SPACING</code
+            >
+          </td>
+          <td>各定数値</td>
+          <td>public class</td>
+          <td>単体テスト</td>
+          <td>
+            Noto Serif JP、12ポイント、横25px、縦2pxであることを確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>
+            <code>CANVAS_VIEWPORT_MARGIN</code
+            >、<code>PLAYBACK_STEP_INTERVAL_MS</code>、選択色定数
+          </td>
+          <td>各定数値</td>
+          <td>public class</td>
+          <td>単体・結合テスト</td>
+          <td>
+            100pxの移動余白、50msの再生間隔、およびRoot・Node・Leaf別の選択色がModelとViewで使用されることを確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>applicationRoot()</code></td>
+          <td><code>Path</code></td>
+          <td>public static</td>
+          <td>単体テスト</td>
+          <td>
+            通常実行時はプロジェクト基準、PyInstaller実行時は<code>sys._MEIPASS</code>を返すことを確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>loadSerifFont()</code></td>
+          <td><code>ImageFont</code></td>
+          <td>public static</td>
+          <td>単体テスト</td>
+          <td>
+            同梱Noto Serif
+            JPを12ポイントで読み込み、日本語を含む文字領域を計測できることを確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <div class="belt"><h3><a id="BaseNode">BaseNode（抽象ノード）</a></h3></div>
-    <table class="bordered-table" aria-label="BaseNodeの属性テスト"><tbody>
-      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>_text</code></td><td>インスタンス</td><td>protected</td><td>文字列を保持し、公開プロパティから観測できることを確認する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_bbox</code></td><td>インスタンス</td><td>protected</td><td>BBoxを保持し、Modelから配置を適用できることを確認する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
-    <table class="bordered-table" aria-label="BaseNodeのメソッドテスト"><tbody>
-      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>__init__(text, bbox)</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>文字列と既定または指定BBoxを保持し、非文字列を拒否することを確認する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>text</code></td><td><code>str</code></td><td>public property</td><td>単体テスト</td><td>保持したノード名を返すことを確認する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>bbox</code></td><td><code>BBox</code></td><td>public property</td><td>単体テスト</td><td>BBoxの取得と置換を確認する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>rename(text)</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>ノード名を更新し、非文字列を拒否することを確認する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
+    <div class="belt">
+      <h3><a id="BaseNode">BaseNode（抽象ノード）</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="BaseNodeの属性テスト">
+      <tbody>
+        <tr>
+          <th>属性（インスタンス変数）</th>
+          <th>束縛</th>
+          <th>分類</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>_text</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>文字列を保持し、公開プロパティから観測できることを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_bbox</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>BBoxを保持し、Modelから配置を適用できることを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="bordered-table" aria-label="BaseNodeのメソッドテスト">
+      <tbody>
+        <tr>
+          <th>メソッド（操作）</th>
+          <th>応答</th>
+          <th>分類</th>
+          <th>テスト種別</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>__init__(text, bbox)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>
+            文字列と既定または指定BBoxを保持し、非文字列を拒否することを確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>text</code></td>
+          <td><code>str</code></td>
+          <td>public property</td>
+          <td>単体テスト</td>
+          <td>保持したノード名を返すことを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>bbox</code></td>
+          <td><code>BBox</code></td>
+          <td>public property</td>
+          <td>単体テスト</td>
+          <td>BBoxの取得と置換を確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>rename(text)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>ノード名を更新し、非文字列を拒否することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <div class="belt"><h3><a id="NodeRoot">Node・Root（親ノード）</a></h3></div>
-    <table class="bordered-table" aria-label="NodeとRootの属性テスト"><tbody>
-      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>_childNodes</code></td><td>インスタンス</td><td>protected</td><td>子ノードを順序付きで保持し、同じインスタンスを共有できることを確認する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
-    <table class="bordered-table" aria-label="NodeとRootのメソッドテスト"><tbody>
-      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>addChild(child)</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>子を追加し、同一の子の重複追加を防ぐことを確認する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>children()</code></td><td><code>tuple[BaseNode]</code></td><td>public</td><td>単体テスト</td><td>内部リストを公開せず、変更不能なタプルを返すことを確認する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
+    <div class="belt">
+      <h3><a id="NodeRoot">Node・Root（親ノード）</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="NodeとRootの属性テスト">
+      <tbody>
+        <tr>
+          <th>属性（インスタンス変数）</th>
+          <th>束縛</th>
+          <th>分類</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>_childNodes</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>
+            子ノードを順序付きで保持し、同じインスタンスを共有できることを確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="bordered-table" aria-label="NodeとRootのメソッドテスト">
+      <tbody>
+        <tr>
+          <th>メソッド（操作）</th>
+          <th>応答</th>
+          <th>分類</th>
+          <th>テスト種別</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>addChild(child)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>子を追加し、同一の子の重複追加を防ぐことを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>children()</code></td>
+          <td><code>tuple[BaseNode]</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>内部リストを公開せず、変更不能なタプルを返すことを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <div class="belt"><h3><a id="Leaf">Leaf（末端ノード）</a></h3></div>
-    <table class="bordered-table" aria-label="Leafの属性テスト"><tbody>
-      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>なし</code></td><td><code>なし</code></td><td><code>なし</code></td><td>BaseNodeの属性だけを保持する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
-    <table class="bordered-table" aria-label="Leafのメソッドテスト"><tbody>
-      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>children()</code></td><td><code>tuple[BaseNode]</code></td><td>public</td><td>単体テスト</td><td>常に空のタプルを返すことを確認する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
+    <div class="belt">
+      <h3><a id="Leaf">Leaf（末端ノード）</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="Leafの属性テスト">
+      <tbody>
+        <tr>
+          <th>属性（インスタンス変数）</th>
+          <th>束縛</th>
+          <th>分類</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>なし</code></td>
+          <td><code>なし</code></td>
+          <td><code>なし</code></td>
+          <td>BaseNodeの属性だけを保持する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="bordered-table" aria-label="Leafのメソッドテスト">
+      <tbody>
+        <tr>
+          <th>メソッド（操作）</th>
+          <th>応答</th>
+          <th>分類</th>
+          <th>テスト種別</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>children()</code></td>
+          <td><code>tuple[BaseNode]</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>常に空のタプルを返すことを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <div class="belt"><h3><a id="Parser">Parser（入力解析）</a></h3></div>
-    <table class="bordered-table" aria-label="Parserの属性テスト"><tbody>
-      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>なし</code></td><td><code>なし</code></td><td><code>なし</code></td><td>解析状態をインスタンスへ残さない。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
-    <table class="bordered-table" aria-label="Parserのメソッドテスト"><tbody>
-      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td rowspan="10"><code>parse(sourceText)</code></td><td rowspan="10"><code>list[BaseNode]</code></td><td rowspan="10">public</td><td>結合テスト</td><td><code>tree.txt</code>を1ルート・70ノードとして解析する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td>結合テスト</td><td><code>forest.txt</code>を3ルート・72ノードとして解析する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td>結合テスト</td><td><code>semilattice.txt</code>を3ルート・69ノードとして解析する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td>単体テスト</td><td>同名かつ異なるIDの3個のObjectを別インスタンスとして保持する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td>単体テスト</td><td>SmallDoubleを2個の親から共有する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td>単体テスト</td><td>空文字列から空のルート一覧を返す。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td>単体テスト</td><td>欠落節、不正ID、重複ID、未知ノード参照を拒否する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td>単体テスト</td><td>文字列以外の入力を拒否する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td>単体テスト</td><td>branches節がないtrees・nodes入力で、同名ノードを複数の親から共有する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td>単体テスト</td><td>branches節がない単一ルートをRootとして生成する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_splitSections(sourceText)</code></td><td><code>dict</code></td><td>protected</td><td>単体テスト</td><td>trees、nodes、branches節へ分割する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_parseNodeLabels(lines)</code></td><td><code>dict[int, str]</code></td><td>protected</td><td>単体テスト</td><td>nodes節からIDと名前を解析し、重複IDを拒否する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_parseNodeRegistry(lines, branches, rootIds)</code></td><td><code>dict</code></td><td>protected</td><td>単体テスト</td><td>ID、接続関係、ルートIDからRoot、Node、Leafを生成する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_parseBranches(lines)</code></td><td><code>list[tuple]</code></td><td>protected</td><td>単体テスト</td><td>親子IDの組を解析する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_branchesFromTrees(lines, labels)</code></td><td><code>tuple</code></td><td>protected</td><td>単体テスト</td><td>trees節から親子IDとルートIDを生成する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_connectBranches(branches, registry)</code></td><td><code>None</code></td><td>protected</td><td>単体テスト</td><td>IDを用いて同一ノードインスタンスを接続する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_parseTrees(lines, registry)</code></td><td><code>None</code></td><td>protected</td><td>単体テスト</td><td>trees節の深さとノード名を解析し、nodes節と照合する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_nodeFor(name, registry)</code></td><td><code>BaseNode</code></td><td>protected</td><td>単体テスト</td><td>名前に対応するノードを返す。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_treeLine(line)</code></td><td><code>tuple[int, str]</code></td><td>protected</td><td>単体テスト</td><td>ASCIIツリーの深さと名前を分離する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
+    <div class="belt">
+      <h3><a id="Parser">Parser（入力解析）</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="Parserの属性テスト">
+      <tbody>
+        <tr>
+          <th>属性（インスタンス変数）</th>
+          <th>束縛</th>
+          <th>分類</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>なし</code></td>
+          <td><code>なし</code></td>
+          <td><code>なし</code></td>
+          <td>解析状態をインスタンスへ残さない。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="bordered-table" aria-label="Parserのメソッドテスト">
+      <tbody>
+        <tr>
+          <th>メソッド（操作）</th>
+          <th>応答</th>
+          <th>分類</th>
+          <th>テスト種別</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td rowspan="10"><code>parse(sourceText)</code></td>
+          <td rowspan="10"><code>list[BaseNode]</code></td>
+          <td rowspan="10">public</td>
+          <td>結合テスト</td>
+          <td><code>tree.txt</code>を1ルート・70ノードとして解析する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>結合テスト</td>
+          <td><code>forest.txt</code>を3ルート・72ノードとして解析する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>結合テスト</td>
+          <td>
+            <code>semilattice.txt</code>を3ルート・69ノードとして解析する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>同名かつ異なるIDの3個のObjectを別インスタンスとして保持する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>SmallDoubleを2個の親から共有する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>空文字列から空のルート一覧を返す。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>欠落節、不正ID、重複ID、未知ノード参照を拒否する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>文字列以外の入力を拒否する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>
+            branches節がないtrees・nodes入力で、同名ノードを複数の親から共有する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>branches節がない単一ルートをRootとして生成する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_splitSections(sourceText)</code></td>
+          <td><code>dict</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>trees、nodes、branches節へ分割する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_parseNodeLabels(lines)</code></td>
+          <td><code>dict[int, str]</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>nodes節からIDと名前を解析し、重複IDを拒否する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_parseNodeRegistry(lines, branches, rootIds)</code></td>
+          <td><code>dict</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>ID、接続関係、ルートIDからRoot、Node、Leafを生成する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_parseBranches(lines)</code></td>
+          <td><code>list[tuple]</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>親子IDの組を解析する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_branchesFromTrees(lines, labels)</code></td>
+          <td><code>tuple</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>trees節から親子IDとルートIDを生成する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_connectBranches(branches, registry)</code></td>
+          <td><code>None</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>IDを用いて同一ノードインスタンスを接続する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_parseTrees(lines, registry)</code></td>
+          <td><code>None</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>trees節の深さとノード名を解析し、nodes節と照合する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_nodeFor(name, registry)</code></td>
+          <td><code>BaseNode</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>名前に対応するノードを返す。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_treeLine(line)</code></td>
+          <td><code>tuple[int, str]</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>ASCIIツリーの深さと名前を分離する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <div class="belt"><h3><a id="GraphTraversal">GraphTraversal（グラフ探索）</a></h3></div>
-    <table class="bordered-table" aria-label="GraphTraversalの属性テスト"><tbody>
-      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>なし</code></td><td><code>なし</code></td><td><code>なし</code></td><td>探索状態をインスタンスへ残さない。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
-    <table class="bordered-table" aria-label="GraphTraversalのメソッドテスト"><tbody>
-      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>rootNodes(nodes)</code></td><td><code>list[BaseNode]</code></td><td>public</td><td>単体テスト</td><td>入次数0のルートを返し、循環グラフでは開始点へフォールバックする。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>reachableFrom(start)</code></td><td><code>list[BaseNode]</code></td><td>public</td><td>単体テスト</td><td>共有ノードを一度だけ訪問し、循環で停止する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>edgesFrom(start)</code></td><td><code>list[tuple]</code></td><td>public</td><td>単体テスト</td><td>開始点以下の重複しない辺を返す。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>allEdges(nodes)</code></td><td><code>list[tuple]</code></td><td>public</td><td>単体テスト</td><td>複数開始点から共有辺を重複なく収集する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_allNodes(starts)</code></td><td><code>list[BaseNode]</code></td><td>protected</td><td>単体テスト</td><td>同一性に基づき幅優先で全ノードを集める。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_unique(nodes)</code></td><td><code>list[BaseNode]</code></td><td>protected</td><td>単体テスト</td><td>開始ノードの重複を同一性に基づいて除去する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
+    <div class="belt">
+      <h3><a id="GraphTraversal">GraphTraversal（グラフ探索）</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="GraphTraversalの属性テスト">
+      <tbody>
+        <tr>
+          <th>属性（インスタンス変数）</th>
+          <th>束縛</th>
+          <th>分類</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>なし</code></td>
+          <td><code>なし</code></td>
+          <td><code>なし</code></td>
+          <td>探索状態をインスタンスへ残さない。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="bordered-table" aria-label="GraphTraversalのメソッドテスト">
+      <tbody>
+        <tr>
+          <th>メソッド（操作）</th>
+          <th>応答</th>
+          <th>分類</th>
+          <th>テスト種別</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>rootNodes(nodes)</code></td>
+          <td><code>list[BaseNode]</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>
+            入次数0のルートを返し、循環グラフでは開始点へフォールバックする。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>reachableFrom(start)</code></td>
+          <td><code>list[BaseNode]</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>共有ノードを一度だけ訪問し、循環で停止する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>edgesFrom(start)</code></td>
+          <td><code>list[tuple]</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>開始点以下の重複しない辺を返す。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>allEdges(nodes)</code></td>
+          <td><code>list[tuple]</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>複数開始点から共有辺を重複なく収集する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_allNodes(starts)</code></td>
+          <td><code>list[BaseNode]</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>同一性に基づき幅優先で全ノードを集める。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_unique(nodes)</code></td>
+          <td><code>list[BaseNode]</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>開始ノードの重複を同一性に基づいて除去する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <div class="belt"><h3><a id="BBoxCalculator">BBoxCalculator（描画領域計算）</a></h3></div>
-    <table class="bordered-table" aria-label="BBoxCalculatorの属性テスト"><tbody>
-      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>_graphTraversal</code></td><td>インスタンス</td><td>protected</td><td>共有・循環対応の探索処理を保持する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
-    <table class="bordered-table" aria-label="BBoxCalculatorのメソッドテスト"><tbody>
-      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>forNodes(nodes)</code></td><td><code>BBox</code></td><td>public</td><td>単体テスト</td><td>全ノードのBBox和集合を返し、空入力では零領域を返す。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>forSubgraph(start)</code></td><td><code>BBox</code></td><td>public</td><td>単体テスト</td><td>選択ノードから到達可能な部分グラフの領域を返す。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_bounds(nodes)</code></td><td><code>BBox</code></td><td>protected</td><td>単体テスト</td><td>負座標を含む複数BBoxの和集合を計算する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
+    <div class="belt">
+      <h3><a id="BBoxCalculator">BBoxCalculator（描画領域計算）</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="BBoxCalculatorの属性テスト">
+      <tbody>
+        <tr>
+          <th>属性（インスタンス変数）</th>
+          <th>束縛</th>
+          <th>分類</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>_graphTraversal</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>共有・循環対応の探索処理を保持する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="bordered-table" aria-label="BBoxCalculatorのメソッドテスト">
+      <tbody>
+        <tr>
+          <th>メソッド（操作）</th>
+          <th>応答</th>
+          <th>分類</th>
+          <th>テスト種別</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>forNodes(nodes)</code></td>
+          <td><code>BBox</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>全ノードのBBox和集合を返し、空入力では零領域を返す。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>forSubgraph(start)</code></td>
+          <td><code>BBox</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>選択ノードから到達可能な部分グラフの領域を返す。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_bounds(nodes)</code></td>
+          <td><code>BBox</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>負座標を含む複数BBoxの和集合を計算する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <div class="belt"><h3><a id="LayoutCalculator">LayoutCalculator（樹状配置）</a></h3></div>
-    <table class="bordered-table" aria-label="LayoutCalculatorの属性テスト"><tbody>
-      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>_measuredSizeCache</code></td><td>インスタンス</td><td>protected</td><td>計測済みノードサイズを保持し、名称変更時に対象を破棄する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_parentsByNode</code></td><td>インスタンス</td><td>protected</td><td>共有ノードを含む親の一覧を保持する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_layoutVersion</code></td><td>インスタンス</td><td>protected</td><td>再配置ごとに工程版を更新する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
-    <table class="bordered-table" aria-label="LayoutCalculatorのメソッドテスト"><tbody>
-      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td rowspan="7"><code>createInitialSteps(nodes, desktop)</code></td><td rowspan="7"><code>list[LayoutStep]</code></td><td rowspan="7">public</td><td>単体テスト</td><td>初期配置から深さごとの完成配置まで複数工程を生成する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td>単体テスト</td><td>横25px、縦2pxの間隔と共有ノードの一意配置を確認する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td>単体テスト</td><td>表示領域の高さを超える初期配置を次の列へ送る。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td>性能テスト</td><td>100ノードの配置工程を3秒未満で生成する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td>単体テスト</td><td>循環グラフでも停止し、全ノードを配置する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td>結合テスト</td><td>要求3サンプルを重なりなく配置し、共有ノードを含む全親子辺が前方向になる。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td>単体テスト</td><td>木ごとに領域を分け、親ノードを最初と最後の子ノードの中央へ配置する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td rowspan="2"><code>recalculate(nodes, changedNode)</code></td><td rowspan="2"><code>list[LayoutStep]</code></td><td rowspan="2">public</td><td>単体テスト</td><td>名称変更で層の最大幅が変わる場合に全体を再計算する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td>単体テスト</td><td>層の最大幅が変わらない場合に変更ノードだけを差分更新する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_measure(node)</code></td><td><code>BBox</code></td><td>protected</td><td>単体テスト</td><td>描画と同じSerif 12ポイントの実フォント領域からサイズを計算する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_buildParentIndex(nodes)</code></td><td><code>None</code></td><td>protected</td><td>単体テスト</td><td>共有ノードに複数の親を登録する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_placeRoots(nodes, viewport)</code></td><td><code>list[LayoutStep]</code></td><td>protected</td><td>単体テスト</td><td>深さ0のルートだけを配置する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_placeDescendants(root)</code></td><td><code>list[LayoutStep]</code></td><td>protected</td><td>単体テスト</td><td>子孫を深さ別の工程へ分割する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_resolveSharedNodes(nodes)</code></td><td><code>list[LayoutStep]</code></td><td>protected</td><td>単体テスト</td><td>複数の親を持つノードを一意に抽出する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_initialPositions(nodes, viewport)</code></td><td><code>dict</code></td><td>protected</td><td>単体テスト</td><td>表示領域に応じた縦並びと列送りを生成する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_hierarchicalPositions(nodes, viewport)</code></td><td><code>tuple[dict, dict]</code></td><td>protected</td><td>単体テスト</td><td>循環を停止させ、深さごとの決定的な配置を生成する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_depthsFor(nodes)</code></td><td><code>dict[BaseNode, int]</code></td><td>protected</td><td>単体テスト</td><td>共有ノードをすべての親より後段に置き、循環があっても停止する深さを生成する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
+    <div class="belt">
+      <h3><a id="LayoutCalculator">LayoutCalculator（樹状配置）</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="LayoutCalculatorの属性テスト">
+      <tbody>
+        <tr>
+          <th>属性（インスタンス変数）</th>
+          <th>束縛</th>
+          <th>分類</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>_measuredSizeCache</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>計測済みノードサイズを保持し、名称変更時に対象を破棄する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_parentsByNode</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>共有ノードを含む親の一覧を保持する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_layoutVersion</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>再配置ごとに工程版を更新する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="bordered-table" aria-label="LayoutCalculatorのメソッドテスト">
+      <tbody>
+        <tr>
+          <th>メソッド（操作）</th>
+          <th>応答</th>
+          <th>分類</th>
+          <th>テスト種別</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td rowspan="7"><code>createInitialSteps(nodes, desktop)</code></td>
+          <td rowspan="7"><code>list[LayoutStep]</code></td>
+          <td rowspan="7">public</td>
+          <td>単体テスト</td>
+          <td>初期配置から深さごとの完成配置まで複数工程を生成する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>横25px、縦2pxの間隔と共有ノードの一意配置を確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>表示領域の高さを超える初期配置を次の列へ送る。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>性能テスト</td>
+          <td>100ノードの配置工程を3秒未満で生成する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>循環グラフでも停止し、全ノードを配置する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>結合テスト</td>
+          <td>
+            要求3サンプルを重なりなく配置し、共有ノードを含む全親子辺が前方向になる。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>
+            木ごとに領域を分け、親ノードを最初と最後の子ノードの中央へ配置する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td rowspan="2"><code>recalculate(nodes, changedNode)</code></td>
+          <td rowspan="2"><code>list[LayoutStep]</code></td>
+          <td rowspan="2">public</td>
+          <td>単体テスト</td>
+          <td>名称変更で層の最大幅が変わる場合に全体を再計算する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>層の最大幅が変わらない場合に変更ノードだけを差分更新する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_measure(node)</code></td>
+          <td><code>BBox</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>
+            描画と同じSerif 12ポイントの実フォント領域からサイズを計算する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_buildParentIndex(nodes)</code></td>
+          <td><code>None</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>共有ノードに複数の親を登録する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_placeRoots(nodes, viewport)</code></td>
+          <td><code>list[LayoutStep]</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>深さ0のルートだけを配置する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_placeDescendants(root)</code></td>
+          <td><code>list[LayoutStep]</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>子孫を深さ別の工程へ分割する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_resolveSharedNodes(nodes)</code></td>
+          <td><code>list[LayoutStep]</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>複数の親を持つノードを一意に抽出する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_initialPositions(nodes, viewport)</code></td>
+          <td><code>dict</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>表示領域に応じた縦並びと列送りを生成する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_hierarchicalPositions(nodes, viewport)</code></td>
+          <td><code>tuple[dict, dict]</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>循環を停止させ、深さごとの決定的な配置を生成する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_depthsFor(nodes)</code></td>
+          <td><code>dict[BaseNode, int]</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>
+            共有ノードをすべての親より後段に置き、循環があっても停止する深さを生成する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <div class="belt"><h3><a id="EventEmitter">EventEmitter（イベント通知）</a></h3></div>
-    <table class="bordered-table" aria-label="EventEmitterの属性テスト"><tbody>
-      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>_callbacks</code></td><td>インスタンス</td><td>protected</td><td>
+    <div class="belt">
+      <h3><a id="EventEmitter">EventEmitter（イベント通知）</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="EventEmitterの属性テスト">
+      <tbody>
+        <tr>
+          <th>属性（インスタンス変数）</th>
+          <th>束縛</th>
+          <th>分類</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>_callbacks</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>
             イベント別の複数callbackを登録順に保持し、イベント間で分離することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-    </tbody></table>
-    <table class="bordered-table" aria-label="EventEmitterのメソッドテスト"><tbody>
-      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>__init__()</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="bordered-table" aria-label="EventEmitterのメソッドテスト">
+      <tbody>
+        <tr>
+          <th>メソッド（操作）</th>
+          <th>応答</th>
+          <th>分類</th>
+          <th>テスト種別</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>__init__()</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>
             購読のない状態で生成し、未登録イベントを安全に通知できることを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td rowspan="3"><code>subscribe(event, callback)</code></td><td rowspan="3"><code>None</code></td><td rowspan="3">public</td><td>結合テスト</td><td>同一イベントへ複数Viewのcallbackを登録できることを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td>単体テスト</td><td>同一callbackの重複登録を1回に抑えることを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td>単体テスト</td><td>呼び出し不能な値を拒否することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td rowspan="4"><code>notify(event)</code></td><td rowspan="4"><code>None</code></td><td rowspan="4">public</td><td>結合テスト</td><td>同一イベントの複数Viewを登録順に通知することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td>単体テスト</td><td>異なるイベントのcallbackを呼び出さないことを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td>単体テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td rowspan="3"><code>subscribe(event, callback)</code></td>
+          <td rowspan="3"><code>None</code></td>
+          <td rowspan="3">public</td>
+          <td>結合テスト</td>
+          <td>同一イベントへ複数Viewのcallbackを登録できることを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>同一callbackの重複登録を1回に抑えることを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>呼び出し不能な値を拒否することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td rowspan="4"><code>notify(event)</code></td>
+          <td rowspan="4"><code>None</code></td>
+          <td rowspan="4">public</td>
+          <td>結合テスト</td>
+          <td>同一イベントの複数Viewを登録順に通知することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>異なるイベントのcallbackを呼び出さないことを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>
             通知中に追加されたcallbackを次回の通知から呼び出すことを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td>単体テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>
             callbackの例外を呼出元へ伝播し、後続callbackを実行しないことを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-    </tbody></table>
-    <div class="belt"><h3><a id="NodeEditorState">NodeEditorState（ノード編集状態）</a></h3></div>
-    <table class="bordered-table" aria-label="NodeEditorStateの属性テスト"><tbody>
-      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>_selectedNode</code></td><td>インスタンス</td><td>protected</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="belt">
+      <h3><a id="NodeEditorState">NodeEditorState（ノード編集状態）</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="NodeEditorStateの属性テスト">
+      <tbody>
+        <tr>
+          <th>属性（インスタンス変数）</th>
+          <th>束縛</th>
+          <th>分類</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>_selectedNode</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>
             編集中のノードを保持し、確定または取消後に解放することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_editingText</code></td><td>インスタンス</td><td>protected</td><td>ノード本体と分離した下書きを保持することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_popupBBox</code></td><td>インスタンス</td><td>protected</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_editingText</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>ノード本体と分離した下書きを保持することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_popupBBox</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>
             編集ポップアップ領域を保持し、取消後に零領域へ戻すことを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-    </tbody></table>
-    <table class="bordered-table" aria-label="NodeEditorStateのメソッドテスト"><tbody>
-      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>__init__()</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>未選択、空文字列、零領域の初期状態を生成することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>selectedNode</code></td><td><code>BaseNode | None</code></td><td>public property</td><td>単体テスト</td><td>選択ノードまたは未選択を返すことを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>editingText</code></td><td><code>str</code></td><td>public property</td><td>単体テスト</td><td>現在の下書きを返すことを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>popupBBox</code></td><td><code>BBox</code></td><td>public property</td><td>単体テスト</td><td>ポップアップ領域を返すことを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>isEditing</code></td><td><code>bool</code></td><td>public property</td><td>単体テスト</td><td>編集開始から確定または取消まで真になることを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td rowspan="2"><code>begin(node, popupBBox)</code></td><td rowspan="2"><code>None</code></td><td rowspan="2">public</td><td>単体テスト</td><td>ノード名を初期下書きとして編集を開始することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td>単体テスト</td><td>不正なノードまたはBBoxを拒否することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>updateDraft(text)</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="bordered-table" aria-label="NodeEditorStateのメソッドテスト">
+      <tbody>
+        <tr>
+          <th>メソッド（操作）</th>
+          <th>応答</th>
+          <th>分類</th>
+          <th>テスト種別</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>__init__()</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>未選択、空文字列、零領域の初期状態を生成することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>selectedNode</code></td>
+          <td><code>BaseNode | None</code></td>
+          <td>public property</td>
+          <td>単体テスト</td>
+          <td>選択ノードまたは未選択を返すことを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>editingText</code></td>
+          <td><code>str</code></td>
+          <td>public property</td>
+          <td>単体テスト</td>
+          <td>現在の下書きを返すことを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>popupBBox</code></td>
+          <td><code>BBox</code></td>
+          <td>public property</td>
+          <td>単体テスト</td>
+          <td>ポップアップ領域を返すことを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>isEditing</code></td>
+          <td><code>bool</code></td>
+          <td>public property</td>
+          <td>単体テスト</td>
+          <td>編集開始から確定または取消まで真になることを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td rowspan="2"><code>begin(node, popupBBox)</code></td>
+          <td rowspan="2"><code>None</code></td>
+          <td rowspan="2">public</td>
+          <td>単体テスト</td>
+          <td>ノード名を初期下書きとして編集を開始することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>不正なノードまたはBBoxを拒否することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>updateDraft(text)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>
             編集中だけ文字列の下書きを更新し、未編集と非文字列を拒否することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>commit()</code></td><td><code>str</code></td><td>public</td><td>単体テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>commit()</code></td>
+          <td><code>str</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>
             下書きを返して状態を初期化し、未編集時は拒否することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>cancel()</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>選択、下書き、ポップアップ領域を初期化することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_requireEditing()</code></td><td><code>None</code></td><td>protected</td><td>単体テスト</td><td>未編集時の下書き更新と確定を拒否することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-    </tbody></table>
-    <div class="belt"><h3><a id="Desktop">Desktop（表示領域状態）</a></h3></div>
-    <table class="bordered-table" aria-label="Desktopの属性テスト"><tbody>
-      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>_windowSizeBBox</code></td><td>インスタンス</td><td>protected</td><td>非負のウィンドウ寸法を保持することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_windowCanvasBBox</code></td><td>インスタンス</td><td>protected</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>cancel()</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>選択、下書き、ポップアップ領域を初期化することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_requireEditing()</code></td>
+          <td><code>None</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>未編集時の下書き更新と確定を拒否することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="belt">
+      <h3><a id="Desktop">Desktop（表示領域状態）</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="Desktopの属性テスト">
+      <tbody>
+        <tr>
+          <th>属性（インスタンス変数）</th>
+          <th>束縛</th>
+          <th>分類</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>_windowSizeBBox</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>非負のウィンドウ寸法を保持することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_windowCanvasBBox</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>
             パンと拡大率を反映したキャンバス表示領域を保持することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_zoomScale</code></td><td>インスタンス</td><td>protected</td><td>既定値1.0と定数範囲内の拡大率を保持することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-    </tbody></table>
-    <table class="bordered-table" aria-label="Desktopのメソッドテスト"><tbody>
-      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>__init__(width, height)</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_zoomScale</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>既定値1.0と定数範囲内の拡大率を保持することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="bordered-table" aria-label="Desktopのメソッドテスト">
+      <tbody>
+        <tr>
+          <th>メソッド（操作）</th>
+          <th>応答</th>
+          <th>分類</th>
+          <th>テスト種別</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>__init__(width, height)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>
             指定寸法または零寸法で初期化し、負の寸法を拒否することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>windowSizeBBox</code></td><td><code>BBox</code></td><td>public property</td><td>単体テスト</td><td>現在のウィンドウ領域を返すことを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>windowCanvasBBox</code></td><td><code>BBox</code></td><td>public property</td><td>単体テスト</td><td>現在表示中のキャンバス領域を返すことを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>zoomScale</code></td><td><code>float</code></td><td>public property</td><td>単体テスト</td><td>現在の拡大率を返すことを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>resize(width, height)</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>windowSizeBBox</code></td>
+          <td><code>BBox</code></td>
+          <td>public property</td>
+          <td>単体テスト</td>
+          <td>現在のウィンドウ領域を返すことを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>windowCanvasBBox</code></td>
+          <td><code>BBox</code></td>
+          <td>public property</td>
+          <td>単体テスト</td>
+          <td>現在表示中のキャンバス領域を返すことを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>zoomScale</code></td>
+          <td><code>float</code></td>
+          <td>public property</td>
+          <td>単体テスト</td>
+          <td>現在の拡大率を返すことを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>resize(width, height)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>
             拡大率を維持してウィンドウと表示領域を更新し、負の寸法を拒否することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>pan(dx, dy)</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>pan(dx, dy)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>
             View座標の移動量を拡大率で換算して表示領域へ反映することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td rowspan="2"><code>zoomAt(anchor, scaleDelta)</code></td><td rowspan="2"><code>None</code></td><td rowspan="2">public</td><td>単体テスト</td><td>アンカー位置を固定して拡大し、上下限へ丸めることを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td>単体テスト</td><td>0以下の倍率を拒否することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>canvasToView(point)</code></td><td><code>Point</code></td><td>public</td><td>単体テスト</td><td>キャンバス座標をView座標へ変換することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>viewToCanvas(point)</code></td><td><code>Point</code></td><td>public</td><td>単体テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td rowspan="2"><code>zoomAt(anchor, scaleDelta)</code></td>
+          <td rowspan="2"><code>None</code></td>
+          <td rowspan="2">public</td>
+          <td>単体テスト</td>
+          <td>アンカー位置を固定して拡大し、上下限へ丸めることを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>0以下の倍率を拒否することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>canvasToView(point)</code></td>
+          <td><code>Point</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>キャンバス座標をView座標へ変換することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>viewToCanvas(point)</code></td>
+          <td><code>Point</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>
             View座標をキャンバス座標へ変換し、往復変換できることを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>resetViewport()</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>resetViewport()</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>
             ウィンドウ寸法を維持してパン位置と拡大率を初期化することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_validateSize(width, height)</code></td><td><code>None</code></td><td>protected static</td><td>単体テスト</td><td>幅または高さが負の値である場合に拒否することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-    </tbody></table>
-    <div class="belt"><h3><a id="Model">Model（状態とユースケース）</a></h3></div>
-    <table class="bordered-table" aria-label="Modelの属性テスト"><tbody>
-      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>events</code></td><td>インスタンス</td><td>public</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_validateSize(width, height)</code></td>
+          <td><code>None</code></td>
+          <td>protected static</td>
+          <td>単体テスト</td>
+          <td>幅または高さが負の値である場合に拒否することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="belt">
+      <h3><a id="Model">Model（状態とユースケース）</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="Modelの属性テスト">
+      <tbody>
+        <tr>
+          <th>属性（インスタンス変数）</th>
+          <th>束縛</th>
+          <th>分類</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>events</code></td>
+          <td>インスタンス</td>
+          <td>public</td>
+          <td>
             ModelEvent別の購読と複数Viewへの通知に使用できることを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_sourceText</code></td><td>インスタンス</td><td>protected</td><td>最後に正常解析された入力文字列を保持することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_nodes</code></td><td>インスタンス</td><td>protected</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_sourceText</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>最後に正常解析された入力文字列を保持することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_nodes</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>
             解析済み開始ノードを保持し、外部へタプルで公開することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_canvasBBox</code></td><td>インスタンス</td><td>protected</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_canvasBBox</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>
             適用済み配置の描画領域を保持し、空入力では零領域になることを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_outputFile</code></td><td>インスタンス</td><td>protected</td><td>最後に正常出力した画像パスを保持することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_desktop</code></td><td>インスタンス</td><td>protected</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_outputFile</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>最後に正常出力した画像パスを保持することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_desktop</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>
             表示領域状態を保持し、4操作を委譲して変更通知することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_nodeEditorState</code></td><td>インスタンス</td><td>protected</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_nodeEditorState</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>
             選択中だけ編集状態を保持し、確定または取消後に解放することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_currentStep</code></td><td>インスタンス</td><td>protected</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_currentStep</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>
             現在の配置工程番号を保持し、前後移動の境界を越えないことを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_totalSteps</code></td><td>インスタンス</td><td>protected</td><td>配置工程の総数を保持することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_isPlaying</code></td><td>インスタンス</td><td>protected</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_totalSteps</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>配置工程の総数を保持することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_isPlaying</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>
             再生状態を保持し、値が変化した場合だけ通知することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_layoutSteps</code></td><td>インスタンス</td><td>protected</td><td>配置工程を保持し、外部へタプルで公開することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_parser</code></td><td>インスタンス</td><td>protected</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_layoutSteps</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>配置工程を保持し、外部へタプルで公開することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_parser</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>
             入力解析を委譲し、解析失敗時に既存状態を変更しないことを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_layoutCalculator</code></td><td>インスタンス</td><td>protected</td><td>初期配置と名称変更後の再配置を委譲することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_bboxCalculator</code></td><td>インスタンス</td><td>protected</td><td>配置適用後の描画領域計算を委譲することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_imageRenderer</code></td><td>インスタンス</td><td>protected</td><td>Canvas全体と選択部分の画像出力を委譲することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-    </tbody></table>
-    <table class="bordered-table" aria-label="Modelのメソッドテスト"><tbody>
-      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>__init__(...)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_layoutCalculator</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>初期配置と名称変更後の再配置を委譲することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_bboxCalculator</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>配置適用後の描画領域計算を委譲することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_imageRenderer</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>Canvas全体と選択部分の画像出力を委譲することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="bordered-table" aria-label="Modelのメソッドテスト">
+      <tbody>
+        <tr>
+          <th>メソッド（操作）</th>
+          <th>応答</th>
+          <th>分類</th>
+          <th>テスト種別</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>__init__(...)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>結合テスト</td>
+          <td>
             空のModel状態と依存オブジェクトを生成し、テスト用依存も注入できることを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>sourceText</code
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>
+            <code>sourceText</code
             >、<code>canvasBBox</code>、<code>outputFile</code>、<code>desktop</code>、<code>nodeEditorState</code>、<code>currentStep</code>、<code>totalSteps</code>、<code
               >isPlaying</code
-            ></td><td>各状態値</td><td>public property</td><td>単体テスト</td><td>各状態を変更操作後に読み取れることを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>nodes</code>、<code>layoutSteps</code></td><td><code>tuple</code></td><td>public property</td><td>単体テスト</td><td>内部の可変リストを公開せずタプルを返すことを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>loadFile(inputPath)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
+            >
+          </td>
+          <td>各状態値</td>
+          <td>public property</td>
+          <td>単体テスト</td>
+          <td>各状態を変更操作後に読み取れることを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>nodes</code>、<code>layoutSteps</code></td>
+          <td><code>tuple</code></td>
+          <td>public property</td>
+          <td>単体テスト</td>
+          <td>内部の可変リストを公開せずタプルを返すことを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>loadFile(inputPath)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>結合テスト</td>
+          <td>
             UTF-8ファイルを読み込んで解析へ渡し、Path以外を拒否することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td rowspan="3"><code>loadText(sourceText)</code></td><td rowspan="3"><code>None</code></td><td rowspan="3">public</td><td>結合テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td rowspan="3"><code>loadText(sourceText)</code></td>
+          <td rowspan="3"><code>None</code></td>
+          <td rowspan="3">public</td>
+          <td>結合テスト</td>
+          <td>
             解析、初期配置、BBox計算を行い、状態領域ごとのイベントを通知することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td>単体テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>
             空入力でノード、工程、描画領域を空状態へ置き換えることを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td>単体テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>
             非文字列を拒否し、解析失敗時に既存状態を変更しないことを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>selectNode(node, popupBBox)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>selectNode(node, popupBBox)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>結合テスト</td>
+          <td>
             Model内のノードだけを選択して編集を開始し、対象外ノードと不正BBoxを拒否することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>clearSelection()</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>clearSelection()</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>
             選択を解除して通知し、未選択時は状態と通知を変えないことを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td rowspan="2"><code>renameSelectedNode(text)</code></td><td rowspan="2"><code>None</code></td><td rowspan="2">public</td><td>結合テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>clearTree()</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>
+            入力、ノード、配置工程、選択、再生、描画領域および出力先を初期状態へ戻し、必要なイベントを通知することを確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td rowspan="2"><code>renameSelectedNode(text)</code></td>
+          <td rowspan="2"><code>None</code></td>
+          <td rowspan="2">public</td>
+          <td>結合テスト</td>
+          <td>
             選択ノードを改名して再配置し、編集状態を解除して通知することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td>単体テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>単体テスト</td>
+          <td>
             未選択と非文字列を拒否し、再配置失敗時は元の名称と選択状態を維持することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>showStep(index)</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>showStep(index)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>
             指定工程を適用して通知し、範囲外番号と整数以外を拒否することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>showPreviousStep()</code>、<code>showNextStep()</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>showPreviousStep()</code>、<code>showNextStep()</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>
             前後の工程へ移動し、先頭と末尾では状態を変えないことを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>setPlaying(isPlaying)</code></td><td><code>None</code></td><td>public</td><td>単体テスト</td><td>
-            boolだけを受け付け、値が変化した場合だけ再生状態を通知することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>exportCanvas(outputPath)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>setPlaying(isPlaying)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>単体テスト</td>
+          <td>
+            boolだけを受け付け、値が変化した場合だけ通知し、完了後の再生では名称変更を保持したまま配置工程を先頭から再実行できることを確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>exportCanvas(outputPath)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>結合テスト</td>
+          <td>
             全体画像出力を委譲して成功パスを保持し、Path以外を拒否することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>exportSelectedSubgraph(outputPath)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>exportSelectedSubgraph(outputPath)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>結合テスト</td>
+          <td>
             選択部分の画像出力を委譲して成功パスを保持し、未選択を拒否することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>resizeDesktop(width, height)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>resizeDesktop(width, height)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>結合テスト</td>
+          <td>
             寸法変更をDesktopへ委譲し、複数ViewへDESKTOP_CHANGEDを通知することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>panDesktop(dx, dy)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
-            パンをDesktopへ委譲し、複数ViewへDESKTOP_CHANGEDを通知することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>zoomDesktopAt(anchor, scaleDelta)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
-            アンカー固定ズームを委譲し、成功時だけ複数Viewへ通知することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>resetDesktopViewport()</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>panDesktop(dx, dy)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>結合テスト</td>
+          <td>
+            100pxの余白を含む範囲へパンを制限し、拡大後の縮小でも横方向の移動可能範囲を失わず、成功時にDESKTOP_CHANGEDを通知することを確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>zoomDesktopAt(anchor, scaleDelta)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>結合テスト</td>
+          <td>
+            アンカー固定ズーム後に表示領域を再制限し、ノードがない場合または倍率が変化しない場合は通知しないことを確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>resetDesktopViewport()</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>結合テスト</td>
+          <td>
             表示領域の初期化を委譲し、複数ViewへDESKTOP_CHANGEDを通知することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_replaceLayoutSteps(steps)</code></td><td><code>None</code></td><td>protected</td><td>単体テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_replaceLayoutSteps(steps)</code></td>
+          <td><code>None</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>
             工程一覧、総数、現在番号を置換し、先頭工程または空状態を適用することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_applyLayoutStep(step)</code></td><td><code>None</code></td><td>protected</td><td>単体テスト</td><td>工程内のBBoxを各ノードへ適用することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_updateCanvasBBox()</code></td><td><code>None</code></td><td>protected</td><td>結合テスト</td><td>BBoxCalculatorから全体描画領域を取得することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_notify(event)</code></td><td><code>None</code></td><td>protected</td><td>結合テスト</td><td>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_applyLayoutStep(step)</code></td>
+          <td><code>None</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>工程内のBBoxを各ノードへ適用することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_updateCanvasBBox()</code></td>
+          <td><code>None</code></td>
+          <td>protected</td>
+          <td>結合テスト</td>
+          <td>BBoxCalculatorから全体描画領域を取得することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>
+            <code>_viewportLimits()</code
+            >、<code>_clampDesktopViewport()</code>、<code
+              >_moveDesktopOriginTo()</code
+            >
+          </td>
+          <td>制限値または<code>None</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>
+            拡大率を考慮した移動境界を計算し、両軸を100pxの表示余白内へ補正することを確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_notify(event)</code></td>
+          <td><code>None</code></td>
+          <td>protected</td>
+          <td>結合テスト</td>
+          <td>
             状態変更に対応するModelEventをEventEmitterへ委譲することを確認する。
-          </td><td>良好（2026年7月31日）</td></tr>
-      <tr><td><code>_validateOutputPath(outputPath)</code></td><td><code>None</code></td><td>protected static</td><td>単体テスト</td><td>画像出力先がPath以外の場合に拒否することを確認する。</td><td>良好（2026年7月31日）</td></tr>
-    </tbody></table>
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_validateOutputPath(outputPath)</code></td>
+          <td><code>None</code></td>
+          <td>protected static</td>
+          <td>単体テスト</td>
+          <td>画像出力先がPath以外の場合に拒否することを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <div class="belt"><h3><a id="ImageRenderer">ImageRenderer（PNG出力）</a></h3></div>
-    <table class="bordered-table" aria-label="ImageRendererの属性テスト"><tbody>
-      <tr><th>属性（インスタンス変数）</th><th>束縛</th><th>分類</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>_graphTraversal</code></td><td>インスタンス</td><td>protected</td><td>部分グラフと辺の収集に使う。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_bboxCalculator</code></td><td>インスタンス</td><td>protected</td><td>画像出力範囲の計算に使う。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_targetCanvas</code></td><td>インスタンス</td><td>protected</td><td>画像出力用Canvasを保持する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
-    <table class="bordered-table" aria-label="ImageRendererのメソッドテスト"><tbody>
-      <tr><th>メソッド（操作）</th><th>応答</th><th>分類</th><th>テスト種別</th><th>説明</th><th>テスト結果</th></tr>
-      <tr><td><code>renderCanvas(nodes, outputPath)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>到達可能な全ノードと辺を含むRGBのPNGを生成し、子ノード位置の描画色と親フォルダ作成を確認する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>renderSubgraph(start, outputPath)</code></td><td><code>None</code></td><td>public</td><td>結合テスト</td><td>選択ノード以下の領域だけをRGBのPNGへ出力する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_createTargetCanvas(bounds)</code></td><td><code>Image</code></td><td>protected</td><td>単体テスト</td><td>余白を含む画像出力用Canvasを生成する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_render(nodes, bounds, targetCanvas, outputPath)</code></td><td><code>None</code></td><td>protected</td><td>単体テスト</td><td>描画済みCanvasをPNGとして保存する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_drawEdges(nodes, draw, offsetX, offsetY)</code></td><td><code>None</code></td><td>protected</td><td>単体テスト</td><td>親子BBox間へ辺を描画する。</td><td>良好（2026年7月30日）</td></tr>
-      <tr><td><code>_drawNodes(nodes, draw, offsetX, offsetY)</code></td><td><code>None</code></td><td>protected</td><td>単体テスト</td><td>Root、Node、Leafの色分けとラベルを描画する。</td><td>良好（2026年7月30日）</td></tr>
-    </tbody></table>
+    <div class="belt">
+      <h3><a id="ImageRenderer">ImageRenderer（PNG出力）</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="ImageRendererの属性テスト">
+      <tbody>
+        <tr>
+          <th>属性（インスタンス変数）</th>
+          <th>束縛</th>
+          <th>分類</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>_graphTraversal</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>部分グラフと辺の収集に使う。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_bboxCalculator</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>画像出力範囲の計算に使う。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_targetCanvas</code></td>
+          <td>インスタンス</td>
+          <td>protected</td>
+          <td>画像出力用Canvasを保持する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="bordered-table" aria-label="ImageRendererのメソッドテスト">
+      <tbody>
+        <tr>
+          <th>メソッド（操作）</th>
+          <th>応答</th>
+          <th>分類</th>
+          <th>テスト種別</th>
+          <th>説明</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>renderCanvas(nodes, outputPath)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>結合テスト</td>
+          <td>
+            到達可能な全ノードと辺を含むRGBのPNGを生成し、子ノード位置の描画色と親フォルダ作成を確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>renderSubgraph(start, outputPath)</code></td>
+          <td><code>None</code></td>
+          <td>public</td>
+          <td>結合テスト</td>
+          <td>選択ノード以下の領域だけをRGBのPNGへ出力する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_createTargetCanvas(bounds)</code></td>
+          <td><code>Image</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>余白を含む画像出力用Canvasを生成する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_render(nodes, bounds, targetCanvas, outputPath)</code></td>
+          <td><code>None</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>描画済みCanvasをPNGとして保存する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_drawEdges(nodes, draw, offsetX, offsetY)</code></td>
+          <td><code>None</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>親子BBox間へ辺を描画する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>_drawNodes(nodes, draw, offsetX, offsetY)</code></td>
+          <td><code>None</code></td>
+          <td>protected</td>
+          <td>単体テスト</td>
+          <td>Root、Node、Leafの色分けとラベルを描画する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="belt">
+      <h3><a id="Controller">Controller（入力の正規化とModelへの委譲）</a></h3>
+    </div>
+    <table class="bordered-table" aria-label="Controllerのテスト">
+      <tbody>
+        <tr>
+          <th>操作</th>
+          <th>テスト種別</th>
+          <th>確認内容</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>openFile()</code>、<code>handleDrop()</code></td>
+          <td>単体テスト</td>
+          <td>
+            PathをModelへ渡し、ドロップ入力は先頭のローカルファイルだけを採用して空入力を無視する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>handleDrop()</code>の異常入力</td>
+          <td>異常系テスト</td>
+          <td>list以外を拒否し、CommandPortを呼ばないことを確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>
+            <code>pointerPressed()</code>、<code>pointerMoved()</code>、<code
+              >pointerReleased()</code
+            >
+          </td>
+          <td>単体・境界値テスト</td>
+          <td>
+            ドラッグ開始閾値、その直前と一致時、差分パン、クリックとの識別、および不正座標の拒否を確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>wheelScrolled()</code>、<code>zoomAt()</code></td>
+          <td>単体テスト</td>
+          <td>
+            スクロール差分をパンへ、倍率をアンカー固定ズームへ変換し、ゼロ入力を無視する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>
+            <code>selectNode()</code>、<code>selectCanvas()</code>、<code
+              >clearTree()</code
+            >
+          </td>
+          <td>単体テスト</td>
+          <td>
+            ノード選択、選択解除、ツリー消去をCommandPortへそのまま委譲する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>confirmRename()</code>、<code>cancelRename()</code></td>
+          <td>単体テスト</td>
+          <td>名称確定と取消を委譲し、Controller外の状態へ直接依存しない。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>
+            <code>play()</code
+            >、<code>pause()</code>、<code>previousStep()</code>、<code>nextStep()</code>、<code
+              >seekStep()</code
+            >
+          </td>
+          <td>単体テスト</td>
+          <td>再生状態と工程移動のメッセージだけをCommandPortへ送る。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>
+            <code>exportCanvas()</code
+            >、<code>exportSelectedSubgraph()</code>、<code>resizeDesktop()</code>、<code
+              >resetViewport()</code
+            >
+          </td>
+          <td>単体テスト</td>
+          <td>出力と表示領域操作を型変換せず委譲する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="belt">
+      <h3>
+        <a id="QtView"
+          >CanvasRenderer・NodeGraphicsItem・ViewTheme（Qt View）</a
+        >
+      </h3>
+    </div>
+    <table class="bordered-table" aria-label="Qt Viewのテスト">
+      <tbody>
+        <tr>
+          <th>対象</th>
+          <th>テスト種別</th>
+          <th>確認内容</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td><code>CanvasRenderer.render()</code></td>
+          <td>結合テスト</td>
+          <td>
+            空状態の案内、ノードと辺の生成、配置工程ごとの既存Item再利用、および構造変更時の再構築を確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>CanvasRenderer.applyViewport()</code></td>
+          <td>結合テスト</td>
+          <td>Modelのパン位置と拡大率をQGraphicsViewの変換へ反映する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>CanvasRenderer.nodeAt()</code></td>
+          <td>単体テスト</td>
+          <td>
+            境界上、パン後、ズーム後の座標から正しいノードを取得し、領域外では<code>None</code>を返す。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>NodeGraphicsItem</code></td>
+          <td>結合テスト</td>
+          <td>
+            Noto Serif
+            JPを使用し、Root・Node・Leafの通常色と、各通常色を濃くした選択色を描き分ける。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>NodeGraphicsItem.updateFromNode()</code></td>
+          <td>単体テスト</td>
+          <td>名称、位置、幅、高さの変更を既存Graphics Itemへ反映する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>clampPopupPosition()</code></td>
+          <td>単体テスト</td>
+          <td>編集ポップアップを表示領域内へ収める境界値を確認する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>
+            <code>NodeEditorPopupView</code>、<code>CanvasPopupView</code>
+          </td>
+          <td>操作テスト</td>
+          <td>
+            Return確定、Escape取消、表示位置補正、ツリー有無による削除可否、および削除後の非表示を確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>ViewTheme.__new__()</code></td>
+          <td>単体テスト</td>
+          <td>定数専用クラスのインスタンス化を拒否する。</td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="belt">
+      <h3><a id="Application">ForestApp・Qtアプリケーション結合</a></h3>
+    </div>
+    <table
+      class="bordered-table"
+      aria-label="ForestAppとQtアプリケーション結合のテスト"
+    >
+      <tbody>
+        <tr>
+          <th>対象</th>
+          <th>テスト種別</th>
+          <th>確認内容</th>
+          <th>テスト結果</th>
+        </tr>
+        <tr>
+          <td>
+            <code>ForestApp.build()</code>、<code>run()</code>、<code
+              >_createApplication()</code
+            >
+          </td>
+          <td>結合テスト</td>
+          <td>
+            MVCを一度だけ構築し、既存QApplicationを再利用してアプリ名と同梱フォントを設定し、View表示後にイベントループを開始する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>ForestApp.run()</code>の構築失敗</td>
+          <td>異常系テスト</td>
+          <td>
+            Model生成失敗を呼出元へ伝播し、View表示とQtイベントループを開始しない。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td><code>main()</code></td>
+          <td>結合テスト</td>
+          <td>
+            エントリーポイントがForestAppを生成して<code>run()</code>を呼び出す。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>実Model・Controller・DesktopView</td>
+          <td>E2E相当テスト</td>
+          <td>
+            実ファイル読込からQGraphicsSceneへのノード・辺・フォント・操作部品の表示までをFakeなしで確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>初期配置と表示領域操作</td>
+          <td>E2E相当テスト</td>
+          <td>
+            縦配置と表示高での列送り、縦ホイール移動、Ctrl+ホイール拡大縮小、および100px余白の境界を確認する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>配置工程の再生</td>
+          <td>E2E相当テスト</td>
+          <td>
+            50ms間隔で全工程を飛ばさず表示し、完了後の再実行でも変更済みノード名を保持する。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+        <tr>
+          <td>ノード編集とキャンバスメニュー</td>
+          <td>E2E相当テスト</td>
+          <td>
+            Returnで名称を確定し、右クリックまたはCtrl+左クリックだけでキャンバスメニューを開き、「ツリーを削除」でファイル選択状態へ戻る。
+          </td>
+          <td>良好（2026年7月31日）</td>
+        </tr>
+      </tbody>
+    </table>
     <hr />
     <div class="right-small">
       Copyright 20xx Project xx, Updated: 2026/07/31 (Created: 2009/11/11)

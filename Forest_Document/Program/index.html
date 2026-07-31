@@ -519,6 +519,22 @@ def testCreateApplicationReusesSingleQtApplication(qtApplication: QApplication) 
     assert first.applicationName() == &quot;Forest&quot;
 
 
+def testRunPropagatesBuildFailureWithoutStartingEventLoop() -&gt; None:
+    application, qtApplication, _, _, _ = buildApplicationFakes()
+
+    def failToBuild() -&gt; Any:
+        raise RuntimeError(&quot;cannot create model&quot;)
+
+    application._modelFactory = failToBuild
+
+    with pytest.raises(RuntimeError, match=&quot;cannot create model&quot;):
+        application.run()
+
+    assert qtApplication.execCalls == 0
+    assert application._application is None
+    assert application._desktopView is None
+
+
 def waitUntil(application: QApplication, predicate: Any, timeout: float = 3.0) -&gt; None:
     deadline = monotonic() + timeout
     while monotonic() &lt; deadline:
@@ -1102,6 +1118,15 @@ def testDropFiltersInvalidEntries(controllerAndCommands: tuple[Controller, Comma
     assert commands.calls == [(&quot;loadFile&quot;, (valid,))]
 
 
+def testDropRejectsNonListInput(controllerAndCommands: tuple[Controller, CommandRecorder]) -&gt; None:
+    controller, commands = controllerAndCommands
+
+    with pytest.raises(TypeError, match=&quot;paths must be a list&quot;):
+        controller.handleDrop((Path(&quot;forest.txt&quot;),))  # ty: ignore[invalid-argument-type]
+
+    assert commands.calls == []
+
+
 def testPointerMovementBelowThresholdDoesNotPan(
     controllerAndCommands: tuple[Controller, CommandRecorder],
 ) -&gt; None:
@@ -1124,6 +1149,16 @@ def testPointerMovementAtThresholdStartsDrag(
         (&quot;panDesktop&quot;, (Constants.DRAG_THRESHOLD, 0.0)),
     ]
     assert not controller.handlePointerRelease(Point(10.0 + Constants.DRAG_THRESHOLD, 20.0))
+
+
+def testReleaseAtThresholdWithoutMoveIsNotClick(
+    controllerAndCommands: tuple[Controller, CommandRecorder],
+) -&gt; None:
+    controller, commands = controllerAndCommands
+    controller.handlePointerPress(Point(0.0, 0.0))
+
+    assert not controller.handlePointerRelease(Point(Constants.DRAG_THRESHOLD, 0.0))
+    assert commands.calls == []
 
 
 def testDraggingForwardsIncrementalMovement(
@@ -2992,6 +3027,26 @@ def testPlayingFromLastStepRestartsExistingLayoutWithoutParsingAgain() -&gt; Non
     assert model.currentStep == 0
     assert root.bbox == BBox(1.0, 2.0, 30.0, 20.0)
     assert parser.sources == [&quot;source&quot;]
+
+
+def testPlayingSingleStepTreeRebuildsAnimationSteps() -&gt; None:
+    root = Root(&quot;Root&quot;)
+    initialStep = LayoutStep(0, {root: BBox(1.0, 2.0, 30.0, 20.0)})
+    rebuiltSteps = [
+        LayoutStep(0, {root: BBox(3.0, 4.0, 30.0, 20.0)}),
+        LayoutStep(1, {root: BBox(5.0, 6.0, 30.0, 20.0)}),
+    ]
+    layout = LayoutCalculatorFake(initialSteps=[initialStep])
+    model = Model(parser=ParserFake([root]), layoutCalculator=layout)
+    model.loadText(&quot;source&quot;)
+    layout.initialSteps = rebuiltSteps
+
+    model.setPlaying(True)
+
+    assert model.isPlaying is True
+    assert model.totalSteps == 2
+    assert model.currentStep == 0
+    assert root.bbox == rebuiltSteps[0].positions[root]
 
 
 def testPlayingFromMiddleKeepsCurrentStep() -&gt; None:
@@ -5288,16 +5343,18 @@ class CanvasPopupView(QFrame):
                     </h5>
                   </div>
                   <pre><code>from dataclasses import dataclass
+from pathlib import Path
 
 import pytest
-from PySide6.QtCore import QPointF
+from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QTransform
-from PySide6.QtWidgets import QGraphicsScene
+from PySide6.QtTest import QTest
+from PySide6.QtWidgets import QApplication, QGraphicsScene, QWidget
 
 from forest.model import NodeEditorState
 from forest.shared import BBox, Constants, Desktop, Point
 from forest.tree import BaseNode, Leaf, Node, Root
-from forest.view import CanvasRenderer, ViewTheme, clampPopupPosition
+from forest.view import CanvasPopupView, CanvasRenderer, NodeEditorPopupView, ViewTheme, clampPopupPosition
 
 
 @dataclass
@@ -5313,6 +5370,26 @@ class GraphicsViewFake:
 
     def setTransform(self, transform: QTransform) -&gt; None:
         self.transforms.append(transform)
+
+
+class PopupControllerRecorder:
+    def __init__(self) -&gt; None:
+        self.calls: list[tuple[str, object | None]] = []
+
+    def confirmRename(self, text: str) -&gt; None:
+        self.calls.append((&quot;confirmRename&quot;, text))
+
+    def cancelPopup(self) -&gt; None:
+        self.calls.append((&quot;cancelPopup&quot;, None))
+
+    def clearTree(self) -&gt; None:
+        self.calls.append((&quot;clearTree&quot;, None))
+
+    def exportCanvas(self, outputPath: Path) -&gt; None:
+        self.calls.append((&quot;exportCanvas&quot;, outputPath))
+
+    def exportSelectedSubgraph(self, outputPath: Path) -&gt; None:
+        self.calls.append((&quot;exportSelectedSubgraph&quot;, outputPath))
 
 
 def buildRenderedState() -&gt; tuple[ViewStateFake, Root, Node, Leaf]:
@@ -5429,6 +5506,39 @@ def testStructureChangeFallsBackAndAddsNewItems() -&gt; None:
     assert (node, added) in renderer.edgeItems
 
 
+def testStructureChangeRemovesObsoleteItemsAndEmptyTreeRestoresPrompt() -&gt; None:
+    state, _, node, leaf = buildRenderedState()
+    renderer = CanvasRenderer(QGraphicsScene(), state)
+    renderer.render(800, 600)
+    node._childNodes.clear()
+
+    assert renderer.syncLayout(800, 600) is False
+    assert leaf not in renderer.nodeItems
+    assert (node, leaf) not in renderer.edgeItems
+
+    state.nodes = ()
+    renderer.render(800, 600)
+    assert renderer.nodeItems == {}
+    assert renderer.edgeItems == {}
+    assert len(renderer._promptItems) == 2
+
+
+def testNodeItemRefreshesRenamedTextAndGeometry() -&gt; None:
+    state, root, _, _ = buildRenderedState()
+    renderer = CanvasRenderer(QGraphicsScene(), state)
+    renderer.render(800, 600)
+    item = renderer.nodeItems[root]
+    root.rename(&quot;Renamed Root&quot;)
+    root.bbox = BBox(40.0, 50.0, 160.0, 45.0)
+
+    renderer.syncLayout(800, 600)
+
+    assert item._label.text() == &quot;Renamed Root&quot;
+    assert item.pos() == QPointF(40.0, 50.0)
+    assert item.path().boundingRect().width() == 160.0
+    assert item.path().boundingRect().height() == 45.0
+
+
 def testViewportTransformUsesModelPanAndZoom() -&gt; None:
     state, _, _, _ = buildRenderedState()
     view = GraphicsViewFake()
@@ -5490,6 +5600,44 @@ def testPopupPositionIsClamped(position: tuple[float, float], expected: tuple[in
 def testViewThemeCannotBeInstantiated() -&gt; None:
     with pytest.raises(TypeError):
         ViewTheme()
+
+
+def testNodeEditorPopupHandlesConfirmEscapeAndClampedState(qtApplication: QApplication) -&gt; None:
+    parent = QWidget()
+    popup = NodeEditorPopupView(parent)
+    controller = PopupControllerRecorder()
+    popup.bindController(controller)
+    node = Leaf(&quot;Original&quot;)
+    state = NodeEditorState()
+    state.begin(node, BBox(900.0, 700.0, 246.0, 154.0))
+
+    popup.showState(state, 800, 600)
+    popup.textEntry.setText(&quot;Renamed&quot;)
+    QTest.keyClick(popup.textEntry, Qt.Key.Key_Return)
+    QTest.keyClick(popup.textEntry, Qt.Key.Key_Escape)
+    qtApplication.processEvents()
+
+    assert popup.pos().x() &lt;= 800 - popup.width() - 10
+    assert popup.pos().y() &lt;= 600 - popup.height() - 10
+    assert controller.calls == [(&quot;confirmRename&quot;, &quot;Renamed&quot;), (&quot;cancelPopup&quot;, None)]
+    parent.close()
+
+
+def testCanvasPopupEnablesDeleteOnlyForLoadedTree(qtApplication: QApplication) -&gt; None:
+    parent = QWidget()
+    popup = CanvasPopupView(parent)
+    controller = PopupControllerRecorder()
+    popup.bindController(controller)
+
+    popup.showAt(0.0, 0.0, 800, 600, False)
+    assert not popup._deleteButton.isEnabled()
+    popup.showAt(0.0, 0.0, 800, 600, True)
+    popup._deleteButton.click()
+    qtApplication.processEvents()
+
+    assert controller.calls == [(&quot;clearTree&quot;, None)]
+    assert not popup.isVisible()
+    parent.close()
 </code></pre>
                 </article>
                 <article class="source-file">

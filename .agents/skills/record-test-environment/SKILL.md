@@ -50,7 +50,7 @@ uv --version
 mise --version
 uv run --project Mobile python -c "import flet; print(flet.version.version)"
 uv run ruff --version
-uv run pyrefly --version
+uv run ty --version
 ```
 
 macOS以外(Windows/Linuxなど)では、同等の情報が取れる標準コマンド
@@ -63,8 +63,8 @@ macOS以外(Windows/Linuxなど)では、同等の情報が取れる標準コマ
 - CPUアーキテクチャ/プロセッサ名
 - メモリ容量
 - OS名・バージョン・ビルド番号
-- Python / uv / mise / flet / ruff / pyrefly のバージョン
-- 確認したテスト対象(TypistArt(Desktop) / Mobile / 両方)
+- Python / uv / mise / flet / ruff / ty のバージョン
+- 確認したテスト対象
 
 ### 2. 重複を判定する
 
@@ -108,9 +108,8 @@ macOS以外(Windows/Linuxなど)では、同等の情報が取れる標準コマ
 <pre>Python {version}
 uv {version}
 mise {version}
-flet {version}
 ruff {version}
-pyrefly {version}</pre>
+ty {version}</pre>
 <table class="content" summary="table">
   <tbody>
     <tr>
@@ -135,6 +134,6 @@ pyrefly {version}</pre>
 次を満たした時に作業完了とする。
 
 - 追加案をユーザーへ提示し、承認を得ている(却下された場合は書き込まずに終了)。
-- 承認された内容だけを `TestResult/index.html` へ反映している。
+- 承認された内容だけを `Forest_Document/TestResult/index.html` へ反映している。
 - フッターの `Updated` を更新している。
 - 重複と判断して追加しなかった場合は、その理由を報告している。

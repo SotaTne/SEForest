@@ -1,14 +1,16 @@
 from dataclasses import dataclass
+from pathlib import Path
 
 import pytest
-from PySide6.QtCore import QPointF
+from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QTransform
-from PySide6.QtWidgets import QGraphicsScene
+from PySide6.QtTest import QTest
+from PySide6.QtWidgets import QApplication, QGraphicsScene, QWidget
 
 from forest.model import NodeEditorState
 from forest.shared import BBox, Constants, Desktop, Point
 from forest.tree import BaseNode, Leaf, Node, Root
-from forest.view import CanvasRenderer, ViewTheme, clampPopupPosition
+from forest.view import CanvasPopupView, CanvasRenderer, NodeEditorPopupView, ViewTheme, clampPopupPosition
 
 
 @dataclass
@@ -24,6 +26,26 @@ class GraphicsViewFake:
 
     def setTransform(self, transform: QTransform) -> None:
         self.transforms.append(transform)
+
+
+class PopupControllerRecorder:
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, object | None]] = []
+
+    def confirmRename(self, text: str) -> None:
+        self.calls.append(("confirmRename", text))
+
+    def cancelPopup(self) -> None:
+        self.calls.append(("cancelPopup", None))
+
+    def clearTree(self) -> None:
+        self.calls.append(("clearTree", None))
+
+    def exportCanvas(self, outputPath: Path) -> None:
+        self.calls.append(("exportCanvas", outputPath))
+
+    def exportSelectedSubgraph(self, outputPath: Path) -> None:
+        self.calls.append(("exportSelectedSubgraph", outputPath))
 
 
 def buildRenderedState() -> tuple[ViewStateFake, Root, Node, Leaf]:
@@ -140,6 +162,39 @@ def testStructureChangeFallsBackAndAddsNewItems() -> None:
     assert (node, added) in renderer.edgeItems
 
 
+def testStructureChangeRemovesObsoleteItemsAndEmptyTreeRestoresPrompt() -> None:
+    state, _, node, leaf = buildRenderedState()
+    renderer = CanvasRenderer(QGraphicsScene(), state)
+    renderer.render(800, 600)
+    node._childNodes.clear()
+
+    assert renderer.syncLayout(800, 600) is False
+    assert leaf not in renderer.nodeItems
+    assert (node, leaf) not in renderer.edgeItems
+
+    state.nodes = ()
+    renderer.render(800, 600)
+    assert renderer.nodeItems == {}
+    assert renderer.edgeItems == {}
+    assert len(renderer._promptItems) == 2
+
+
+def testNodeItemRefreshesRenamedTextAndGeometry() -> None:
+    state, root, _, _ = buildRenderedState()
+    renderer = CanvasRenderer(QGraphicsScene(), state)
+    renderer.render(800, 600)
+    item = renderer.nodeItems[root]
+    root.rename("Renamed Root")
+    root.bbox = BBox(40.0, 50.0, 160.0, 45.0)
+
+    renderer.syncLayout(800, 600)
+
+    assert item._label.text() == "Renamed Root"
+    assert item.pos() == QPointF(40.0, 50.0)
+    assert item.path().boundingRect().width() == 160.0
+    assert item.path().boundingRect().height() == 45.0
+
+
 def testViewportTransformUsesModelPanAndZoom() -> None:
     state, _, _, _ = buildRenderedState()
     view = GraphicsViewFake()
@@ -201,3 +256,41 @@ def testPopupPositionIsClamped(position: tuple[float, float], expected: tuple[in
 def testViewThemeCannotBeInstantiated() -> None:
     with pytest.raises(TypeError):
         ViewTheme()
+
+
+def testNodeEditorPopupHandlesConfirmEscapeAndClampedState(qtApplication: QApplication) -> None:
+    parent = QWidget()
+    popup = NodeEditorPopupView(parent)
+    controller = PopupControllerRecorder()
+    popup.bindController(controller)
+    node = Leaf("Original")
+    state = NodeEditorState()
+    state.begin(node, BBox(900.0, 700.0, 246.0, 154.0))
+
+    popup.showState(state, 800, 600)
+    popup.textEntry.setText("Renamed")
+    QTest.keyClick(popup.textEntry, Qt.Key.Key_Return)
+    QTest.keyClick(popup.textEntry, Qt.Key.Key_Escape)
+    qtApplication.processEvents()
+
+    assert popup.pos().x() <= 800 - popup.width() - 10
+    assert popup.pos().y() <= 600 - popup.height() - 10
+    assert controller.calls == [("confirmRename", "Renamed"), ("cancelPopup", None)]
+    parent.close()
+
+
+def testCanvasPopupEnablesDeleteOnlyForLoadedTree(qtApplication: QApplication) -> None:
+    parent = QWidget()
+    popup = CanvasPopupView(parent)
+    controller = PopupControllerRecorder()
+    popup.bindController(controller)
+
+    popup.showAt(0.0, 0.0, 800, 600, False)
+    assert not popup._deleteButton.isEnabled()
+    popup.showAt(0.0, 0.0, 800, 600, True)
+    popup._deleteButton.click()
+    qtApplication.processEvents()
+
+    assert controller.calls == [("clearTree", None)]
+    assert not popup.isVisible()
+    parent.close()
